@@ -177,6 +177,9 @@ void handleCameraMovement(GLFWwindow* window, float deltaTime)
 
 void windowSizeChangeCallback(GLFWwindow* window, int newWidth, int newHeight)
 {
+	if (newWidth == 0 || newHeight == 0) // ignore minimizing
+		return;
+
 	glViewport(0, 0, newWidth, newHeight);
 	mainCam.SetAspectRatio((float)newWidth / newHeight);
 }
