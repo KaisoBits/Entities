@@ -76,6 +76,8 @@ StyleCopReport.xml
 *.ilk
 *.meta
 *.obj
+# .obj is also used for 3D models - don't ignore them!
+!*/models/**/*.obj
 *.iobj
 *.pch
 *.pdb
