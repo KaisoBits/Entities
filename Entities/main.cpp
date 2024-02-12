@@ -23,7 +23,7 @@ using namespace std::chrono_literals;
 const int windowWidth = 800;
 const int windowHeight = 600;
 
-const float cameraSpeed = 40.0f;
+const float cameraSpeed = 60.0f;
 const float mouseSensitivity = 1.0f;
 
 void windowSizeChangeCallback(GLFWwindow* window, int newWidth, int newHeight);
