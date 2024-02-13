@@ -35,6 +35,34 @@ public:
 	float GetAspectRatio() const { return m_aspectRatio; }
 	void SetAspectRatio(float aspectRatio) { m_aspectRatio = aspectRatio; }
 
+	glm::vec3 Forward() 
+	{
+		glm::vec3 forwardVector(
+			cos(glm::radians(m_rotation.x + 90)) * cos(glm::radians(m_rotation.y)),
+			sin(glm::radians(m_rotation.y)),
+			sin(glm::radians(m_rotation.x + 90)) * cos(glm::radians(m_rotation.y)));
+		return glm::normalize(-forwardVector);
+	}
+
+	glm::vec3 ForwardJustYaw()
+	{
+		glm::vec3 forwardVectorJustYaw(
+			cos(glm::radians(m_rotation.x + 90)),
+			0,
+			sin(glm::radians(m_rotation.x + 90)));
+		return glm::normalize(-forwardVectorJustYaw);
+	}
+
+	glm::vec3 Up()
+	{
+		return glm::vec3(0, 1, 0);
+	}
+
+	glm::vec3 Right()
+	{
+		return glm::cross(ForwardJustYaw(), Up());
+	}
+
 	void Apply(int shaderId) const
 	{
 		int viewMatrixLocation = glGetUniformLocation(shaderId, "view");

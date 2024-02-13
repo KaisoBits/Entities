@@ -139,20 +139,7 @@ void handleCameraMovement(GLFWwindow* window, float deltaTime)
 
 	glm::vec3 position = mainCam.GetPosition();
 
-	glm::vec2 camRotation = mainCam.GetRotation();
-	glm::vec3 startVector(0.0f, 0.0f, -1.0f);
-
-	glm::vec3 forwardVectorJustYaw(
-		cos(glm::radians(camRotation.x + 90)),
-		0,
-		sin(glm::radians(camRotation.x + 90)));
-	forwardVectorJustYaw = glm::normalize(-forwardVectorJustYaw);
-
-	glm::vec3 forwardVector(
-		cos(glm::radians(camRotation.x + 90)) * cos(glm::radians(camRotation.y)),
-		sin(glm::radians(camRotation.y)),
-		sin(glm::radians(camRotation.x + 90)) * cos(glm::radians(camRotation.y)));
-	forwardVector = glm::normalize(-forwardVector);
+	glm::vec3 forwardVectorJustYaw = mainCam.ForwardJustYaw();
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		position += forwardVectorJustYaw * deltaTime * cameraSpeed;
