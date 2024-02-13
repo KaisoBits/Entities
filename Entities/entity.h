@@ -27,6 +27,9 @@ public:
 	void SetRotation(glm::vec3 rotation) { m_rotation = rotation; }
 	glm::vec3 GetRotation() const { return m_rotation; }
 
+	void SetScale(glm::vec3 scale) { m_scale = scale; }
+	glm::vec3 GetScale() const { return m_scale; }
+
 	void Update(float deltaTime);
 
 	void SetUpdateFunc(

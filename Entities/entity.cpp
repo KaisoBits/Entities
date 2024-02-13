@@ -27,7 +27,7 @@ void Entity::ApplyPositionAndRotation() const
 				glm::translate(glm::mat4(1.0f), m_position),
 				m_rotation.y,
 				glm::vec3(0.0f, 1.0f, 0.0f)),
-			glm::vec3(1.0f, 1.0f, 1.0f));
+			m_scale);
 
 		glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 	}
