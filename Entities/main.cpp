@@ -61,17 +61,16 @@ int main()
 	std::string fragmentShader = readFileAsString("shaders/fragmentShader.glsl");
 
 	const ShaderProgram sp = ShaderProgram::Compile(vertexShader, fragmentShader);
-	const Model model = ObjParser::LoadFromFile("models/cat.obj");
+	const Model model = ObjParser::LoadFromFile("models/cat2.obj");
 	Material material1(sp);
-	material1.SetVec4("color", glm::vec4(0.4f, 0.8f, 0.2f, 1.0f));
-	Texture textureCat = Texture::LoadFromFile("textures/cat.jpg");
+	const Texture textureCat = Texture::LoadFromFile("textures/cat2.jpg");
 	material1.AddTexture(textureCat);
 
 	std::vector<Entity> entities;
 
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		for (int j = 0; j < 20; j++)
+		for (int j = 0; j < 10; j++)
 		{
 			float value = (i + j) / 2.0f;
 
@@ -93,8 +92,16 @@ int main()
 		}
 	}
 
-	mainCam.SetPosition(glm::vec3(-76.0f, 71.0f, 0.5f));
-	mainCam.SetRotation(glm::vec2(-236.0f, 21.0f));
+	const Model groundModel = ObjParser::LoadFromFile("models/ground.obj");
+	Material groundMaterial(sp);
+	const Texture groundTexture = Texture::LoadFromFile("textures/ground_color.jpg");
+	groundMaterial.AddTexture(groundTexture);
+	Entity groundEntity(&groundModel, groundMaterial);
+	groundEntity.SetScale(glm::vec3(10, 10, 10));
+	entities.push_back(groundEntity);
+
+	mainCam.SetPosition(glm::vec3(-36.0f, 20.0f, 0.5f));
+	mainCam.SetRotation(glm::vec2(-136.0f, 21.0f));
 
 	glViewport(0, 0, windowWidth, windowHeight);
 	glfwSetWindowSizeCallback(window, windowSizeChangeCallback);
