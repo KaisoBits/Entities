@@ -61,9 +61,9 @@ int main()
 	std::string fragmentShader = readFileAsString("shaders/fragmentShader.glsl");
 
 	const ShaderProgram sp = ShaderProgram::Compile(vertexShader, fragmentShader);
-	const Model model = ObjParser::LoadFromFile("models/cat2.obj");
+	const Model model = ObjParser::LoadFromFile("models/monkey.obj");
 	Material material1(sp);
-	const Texture textureCat = Texture::LoadFromFile("textures/cat2.jpg");
+	const Texture textureCat = Texture::LoadFromFile("textures/ground_color.jpg");
 	material1.AddTexture(textureCat);
 
 	std::vector<Entity> entities;
@@ -76,12 +76,13 @@ int main()
 
 			Entity e(&model, material1);
 			e.SetPosition(glm::vec3(i * 20, 0, j * 20));
+			e.SetScale(glm::vec3(5));
 			e.SetUpdateFunc([value](Entity* e, float deltaTime) mutable {
 				const float animationHeight = 10.0f;
 
 				glm::vec3 position = e->GetPosition();
 				position.y = sin(value) * animationHeight;
-				e->SetPosition(position);
+				// e->SetPosition(position);
 
 				e->SetRotation(glm::vec3(0, value / 3.0f, 0));
 
@@ -92,15 +93,16 @@ int main()
 		}
 	}
 
-	const Model groundModel = ObjParser::LoadFromFile("models/ground.obj");
+	const Model groundModel = ObjParser::LoadFromFile("models/flipped.obj");
 	Material groundMaterial(sp);
 	const Texture groundTexture = Texture::LoadFromFile("textures/ground_color.jpg");
 	groundMaterial.AddTexture(groundTexture);
 	Entity groundEntity(&groundModel, groundMaterial);
-	groundEntity.SetScale(glm::vec3(10, 10, 10));
+	groundEntity.SetPosition(glm::vec3(0, -15, 0));
+	groundEntity.SetScale(glm::vec3(10, 1, 10));
 	entities.push_back(groundEntity);
 
-	mainCam.SetPosition(glm::vec3(-36.0f, 20.0f, 0.5f));
+	mainCam.SetPosition(glm::vec3(0, 10, 0));
 	mainCam.SetRotation(glm::vec2(-136.0f, 21.0f));
 
 	glViewport(0, 0, windowWidth, windowHeight);
