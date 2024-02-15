@@ -93,7 +93,7 @@ int main()
 		}
 	}
 
-	const Model groundModel = ObjParser::LoadFromFile("models/flipped.obj");
+	const Model groundModel = ObjParser::LoadFromFile("models/ground.obj");
 	Material groundMaterial(sp);
 	const Texture groundTexture = Texture::LoadFromFile("textures/ground_color.jpg");
 	groundMaterial.AddTexture(groundTexture);
