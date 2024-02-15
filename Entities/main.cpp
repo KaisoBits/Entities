@@ -81,17 +81,18 @@ int main()
 			Entity e(&model, material1);
 			e.SetPosition(glm::vec3(i * 20, 0, j * 20));
 			e.SetScale(glm::vec3(5));
-			e.SetUpdateFunc([value](Entity* e, float deltaTime) mutable {
-				const float animationHeight = 10.0f;
+			e.SetUpdateFunc(
+				[value](Entity* e, float deltaTime) mutable {
+					const float animationHeight = 10.0f;
 
-				glm::vec3 position = e->GetPosition();
-				position.y = sin(value) * animationHeight;
-				// e->SetPosition(position);
+					glm::vec3 position = e->GetPosition();
+					position.y = sin(value) * animationHeight;
+					// e->SetPosition(position);
 
-				e->SetRotation(glm::vec3(0, value / 3.0f, 0));
+					e->SetRotation(glm::vec3(0, value / 3.0f, 0));
 
-				value += 2.0f * deltaTime;
-			});
+					value += 2.0f * deltaTime;
+				});
 
 			entities.push_back(e);
 		}
