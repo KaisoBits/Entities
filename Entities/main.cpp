@@ -87,7 +87,7 @@ int main()
 				e->SetRotation(glm::vec3(0, value / 3.0f, 0));
 
 				value += 2.0f * deltaTime;
-				});
+			});
 
 			entities.push_back(e);
 		}
@@ -98,8 +98,8 @@ int main()
 	const Texture groundTexture = Texture::LoadFromFile("textures/ground_color.jpg");
 	groundMaterial.AddTexture(groundTexture);
 	Entity groundEntity(&groundModel, groundMaterial);
-	groundEntity.SetPosition(glm::vec3(0, -15, 0));
-	groundEntity.SetScale(glm::vec3(10, 1, 10));
+	groundEntity.SetPosition(glm::vec3(100, -15, 100));
+	groundEntity.SetScale(glm::vec3(20, 1, 20));
 	entities.push_back(groundEntity);
 
 	mainCam.SetPosition(glm::vec3(0, 10, 0));
