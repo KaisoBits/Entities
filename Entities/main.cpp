@@ -24,7 +24,7 @@ const int windowWidth = 800;
 const int windowHeight = 600;
 
 const float cameraSpeed = 60.0f;
-const float mouseSensitivity = 1.0f;
+const float mouseSensitivity = 0.2f;
 
 void windowSizeChangeCallback(GLFWwindow* window, int newWidth, int newHeight);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -56,6 +56,10 @@ int main()
 	{
 		return -3;
 	}
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	if (glfwRawMouseMotionSupported())
+		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
 	std::string vertexShader = readFileAsString("shaders/vertexShader.glsl");
 	std::string fragmentShader = readFileAsString("shaders/fragmentShader.glsl");
@@ -182,18 +186,22 @@ void windowSizeChangeCallback(GLFWwindow* window, int newWidth, int newHeight)
 
 double lastX = -1;
 double lastY = -1;
+bool firstInput = true;
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	if (lastX >= 0)
+	if (firstInput)
 	{
-		glm::vec2 camRotation = mainCam.GetRotation();
-
-		camRotation.x += (xpos - lastX) * mouseSensitivity;
-		camRotation.y = fmin(fmax(camRotation.y + (ypos - lastY) * mouseSensitivity, -89.0f), 89.0f);
-
-		mainCam.SetRotation(camRotation);
+		firstInput = false;
+		return;
 	}
+
+	glm::vec2 camRotation = mainCam.GetRotation();
+
+	camRotation.x += (xpos - lastX) * mouseSensitivity;
+	camRotation.y = fmin(fmax(camRotation.y + (ypos - lastY) * mouseSensitivity, -89.0f), 89.0f);
+
+	mainCam.SetRotation(camRotation);
 
 	lastX = xpos;
 	lastY = ypos;
