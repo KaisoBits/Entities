@@ -27,5 +27,5 @@ void main()
 	vec3 normalRotationOnly = mat3(transpose(inverse(model))) * normal;
 
 	float dotResult = dot(normalize(normalRotationOnly), normalize(sunDirectionVector));
-	sunStrength = max(map(dotResult, -1, 0, 1.5, -.5), 0);
+	sunStrength = max(map(dotResult, -1, -0.1, 1.5, 0), 0);
 }
