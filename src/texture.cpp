@@ -8,6 +8,7 @@
 
 Texture Texture::LoadFromFile(const std::string& path)
 {
+	std::cout << "Loading texture " << path << "\n";
 	stbi_set_flip_vertically_on_load(true);
 
 	int width, height, channelsCount;
@@ -15,10 +16,12 @@ Texture Texture::LoadFromFile(const std::string& path)
 
 	if (!imageData)
 	{
-		std::cout << "Failed to load texture " << path << "\n";
+		std::cout << "  Failed to load texture " << path << "\n";
 		return Empty();
 	}
 
+	std::cout << "  Loaded from file\n";
+	
 	unsigned int texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -26,6 +29,8 @@ Texture Texture::LoadFromFile(const std::string& path)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
+	std::cout << "  Sent to GPU\n";
+	
 	stbi_image_free(imageData);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
