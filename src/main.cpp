@@ -65,9 +65,9 @@ int main()
 	std::string fragmentShader = readFileAsString("shaders/fragmentShader.glsl");
 
 	const ShaderProgram sp = ShaderProgram::Compile(vertexShader, fragmentShader);
-	const Model model = ObjParser::LoadFromFile("models/monkey.obj");
+	const Model model = ObjParser::LoadFromFile("resources/models/monkey.obj");
 	Material material1(sp);
-	const Texture textureCat = Texture::LoadFromFile("textures/ground_color.jpg");
+	const Texture textureCat = Texture::LoadFromFile("resources/textures/ground_color.jpg");
 	material1.AddTexture(textureCat);
 
 	std::vector<Entity> entities;
@@ -98,9 +98,9 @@ int main()
 		}
 	}
 
-	const Model groundModel = ObjParser::LoadFromFile("models/ground.obj");
+	const Model groundModel = ObjParser::LoadFromFile("resources/models/ground.obj");
 	Material groundMaterial(sp);
-	const Texture groundTexture = Texture::LoadFromFile("textures/ground_color.jpg");
+	const Texture groundTexture = Texture::LoadFromFile("resources/textures/ground_color.jpg");
 	groundMaterial.AddTexture(groundTexture);
 	Entity groundEntity(&groundModel, groundMaterial);
 	groundEntity.SetPosition(glm::vec3(100, -15, 100));
