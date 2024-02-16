@@ -151,14 +151,11 @@
     <ClCompile Include="shaderprogram.cpp" />
     <ClCompile Include="texture.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="shaders/**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="shaders/**" />
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="shaders/**" >
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</EmbeddedResource>
+	</ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="entity.h" />
