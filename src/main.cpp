@@ -24,7 +24,7 @@ constexpr int windowWidth = 800;
 constexpr int windowHeight = 600;
 
 constexpr float cameraSpeed = 60.0f;
-constexpr float mouseSensitivity = 0.2f;
+constexpr float mouseSensitivity = 0.1f;
 
 void windowSizeChangeCallback(GLFWwindow* window, int newWidth, int newHeight);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
