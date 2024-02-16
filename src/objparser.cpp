@@ -93,7 +93,7 @@ Model ObjParser::LoadFromFile(const std::string& filePath)
 		}
 
 		if (lineIndex % 30 == 0) // Update every x lines
-			std::cout << "\r  Loaded: " << (static_cast<float>(read) / static_cast<float>(fileSize)) * 100 << "%       ";
+			std::cout << "\r  Loaded: " << (static_cast<double>(read) / static_cast<double>(fileSize)) * 100 << "%       ";
 	}
 
 	std::cout << "\r  Loaded: 100.00%     \n";

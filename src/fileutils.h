@@ -23,7 +23,7 @@ inline std::vector<std::string> readFileAsLines(const std::string& path) {
 	std::ifstream stream(path);
 	if (!stream.is_open()) {
 		std::cout << "Could not open file " << path << '\n';
-		return {};
+		return result;
 	}
 	std::string line;
 	while (std::getline(stream, line)) {
