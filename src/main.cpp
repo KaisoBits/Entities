@@ -53,6 +53,7 @@ int main()
 
 	if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
 	{
+		glfwTerminate();
 		return -3;
 	}
 
