@@ -169,8 +169,6 @@ void handleCameraMovement(GLFWwindow* window, float deltaTime)
 		position -= up * deltaTime * cameraSpeed;
 
 	mainCam.SetPosition(position);
-
-	std::this_thread::sleep_for(1ms);
 }
 
 void windowSizeChangeCallback(GLFWwindow* window, int newWidth, int newHeight)
