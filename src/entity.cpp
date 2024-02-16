@@ -43,5 +43,5 @@ void Entity::Update(float deltaTime)
 
 void Entity::SetUpdateFunc(std::function<void(Entity* entity, float deltaTime)> updateFunc)
 {
-	m_updateFunc = updateFunc;
+	m_updateFunc = std::move(updateFunc);
 }

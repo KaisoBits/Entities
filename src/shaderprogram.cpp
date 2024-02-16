@@ -16,6 +16,7 @@ ShaderProgram ShaderProgram::Compile(const std::string& vertexShaderSource, cons
 	{
 		glGetShaderInfoLog(vertexShader, sizeof(infoLog), nullptr, infoLog);
 		std::cout << "Failed vertex shader compilation. Error: \"" << infoLog << "\"\n";
+		return Empty();
 	}
 
 	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -27,6 +28,7 @@ ShaderProgram ShaderProgram::Compile(const std::string& vertexShaderSource, cons
 	{
 		glGetShaderInfoLog(fragmentShader, sizeof(infoLog), nullptr, infoLog);
 		std::cout << "Failed fragment shader compilation. Error: \"" << infoLog << "\"\n";
+		return Empty();
 	}
 
 	unsigned int shaderProgram = glCreateProgram();

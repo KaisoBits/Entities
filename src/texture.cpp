@@ -16,7 +16,7 @@ Texture Texture::LoadFromFile(const std::string& path)
 	if (!imageData)
 	{
 		std::cout << "Failed to load texture " << path << "\n";
-		throw 1;
+		return Empty();
 	}
 
 	unsigned int texture;

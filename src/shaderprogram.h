@@ -5,17 +5,16 @@
 class ShaderProgram
 {
 public:
-	ShaderProgram() = delete;
-
 	static ShaderProgram Compile(const std::string& vertexShaderSource, const std::string& fragmentShaderSource);
+	static ShaderProgram Empty() { return ShaderProgram(0); }
 
-	int GetPramLocation(const std::string& paramName) const;
+	[[nodiscard]] int GetPramLocation(const std::string& paramName) const;
 	void Use() const;
 
-	unsigned int GetId() const { return m_programId; }
+	[[nodiscard]] unsigned int GetId() const { return m_programId; }
 
 private:
-	ShaderProgram(unsigned int programId) : m_programId(programId) {}
+	explicit ShaderProgram(unsigned int programId) : m_programId(programId) {}
 
 	unsigned int m_programId = 0;
 };
