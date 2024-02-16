@@ -115,7 +115,11 @@ int main()
 	glfwSetCursorPosCallback(window, mouse_callback);
 
 	glClearColor(160 / 255.0f, 217 / 255.0f, 239 / 255.0f, 1.0f);
+
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+
+	glCullFace(GL_BACK);
 
 	double lastTime = glfwGetTime();
 	while (!glfwWindowShouldClose(window))
