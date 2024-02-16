@@ -1,12 +1,11 @@
 #include <string>
+#include <vector>
 
 #include "objParser.h"
 #include "fileutils.h"
 
 Model ObjParser::LoadFromFile(const std::string& filePath)
 {
-	std::cout << "Loading model: " << filePath << std::endl;
-
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> endVertices;
 
@@ -16,30 +15,26 @@ Model ObjParser::LoadFromFile(const std::string& filePath)
 	std::vector<glm::vec3> normal;
 	std::vector<glm::vec3> endNormal;
 
-	std::ifstream fileStream = readFileAsStream(filePath);
-	if (fileStream.bad())
+	std::cout << "Loading model: " << filePath << '\n';
+	std::streamoff fileSize = getFileSize(filePath);
+	std::cout << "  Size: " << static_cast<double>(fileSize) / 1024.0 << "KiB\n";
+	
+	std::vector<std::string> lines = readFileAsLines(filePath);
+	std::cout << "  Loaded data from file\n";
+
+
+	unsigned long long read = 0;
+	unsigned long long lineIndex = -1;
+	for (const std::string& line : lines)
 	{
-		std::cout << "Failed to load the model data\n";
-		throw 1;
-	}
+		lineIndex++;
+		
+		read += line.size();
 
-	int fileSize = getFileSize(filePath);
-	std::cout << "  Size: " << fileSize / 1024.0f << "KiB\n";
-
-	int read = 0;
-
-	int line = 0;
-	std::string s;
-
-	while (std::getline(fileStream, s))
-	{
-		line++;
-		read += s.size();
-
-		if (s.starts_with('#'))
+		if (line.starts_with('#'))
 			continue;
 
-		const std::vector tokens = TokenizeString(s, ' ');
+		const std::vector tokens = TokenizeString(line, ' ');
 		if (tokens.empty())
 			continue;
 
@@ -47,7 +42,7 @@ Model ObjParser::LoadFromFile(const std::string& filePath)
 		{
 			if (tokens.size() != 4)
 			{
-				std::cout << "Invalid data read at line {" << line << "} when parsing " << filePath << std::endl;
+				std::cout << "Invalid data read at line {" << line << "} when parsing " << filePath << '\n';
 				continue;
 			}
 
@@ -57,7 +52,7 @@ Model ObjParser::LoadFromFile(const std::string& filePath)
 		{
 			if (tokens.size() != 4)
 			{
-				std::cout << "Invalid data read at line {" << line << "} when parsing " << filePath << std::endl;
+				std::cout << "Invalid data read at line {" << line << "} when parsing " << filePath << '\n';
 				continue;
 			}
 
@@ -67,7 +62,7 @@ Model ObjParser::LoadFromFile(const std::string& filePath)
 		{
 			if (tokens.size() != 3)
 			{
-				std::cout << "Invalid data read at line {" << line << "} when parsing " << filePath << std::endl;
+				std::cout << "Invalid data read at line {" << line << "} when parsing " << filePath << '\n';
 				continue;
 			}
 
@@ -77,7 +72,7 @@ Model ObjParser::LoadFromFile(const std::string& filePath)
 		{
 			if (tokens.size() != 4)
 			{
-				std::cout << "Invalid data read at line {" << line << "} when parsing " << filePath << std::endl;
+				std::cout << "Invalid data read at line {" << line << "} when parsing " << filePath << '\n';
 				continue;
 			}
 
@@ -97,17 +92,15 @@ Model ObjParser::LoadFromFile(const std::string& filePath)
 			endNormal.push_back(normal[std::stoi(vec[2]) - 1]);
 		}
 
-		if (line % 20 == 0) // Every 20 lines
+		if (lineIndex % 30 == 0) // Update every x lines
 			std::cout << "\r  Loaded: " << (static_cast<float>(read) / static_cast<float>(fileSize)) * 100 << "%       ";
 	}
 
 	std::cout << "\r  Loaded: 100.00%     \n";
 
-	Model model = Model::Create(FlattenVector3(endVertices), FlattenVector2(endUv), FlattenVector3(endNormal));
-
 	std::cout << "  Model loaded: " << filePath << '\n';
 
-	return model;
+	return Model::Create(FlattenVector3(endVertices), FlattenVector2(endUv), FlattenVector3(endNormal));
 }
 
 std::vector<float> ObjParser::FlattenVector3(const std::vector<glm::vec3>& vector)
@@ -147,8 +140,8 @@ std::vector<std::string> ObjParser::TokenizeString(std::string_view stringToToke
 
 	bool isInChar = true;
 	std::string current;
-
-	for (char c : stringToTokenize)
+	
+	for (const char c : stringToTokenize)
 	{
 		if (c == '#')
 			break;
@@ -167,7 +160,7 @@ std::vector<std::string> ObjParser::TokenizeString(std::string_view stringToToke
 		{
 			isInChar = true;
 			result.push_back(current);
-			current = std::string();
+			current.clear();
 		}
 	}
 

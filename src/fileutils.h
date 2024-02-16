@@ -1,27 +1,34 @@
 #pragma once
 
-#include <string>
-#include <string_view>
 #include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
 #include <iostream>
 
-inline std::string readFileAsString(const std::string& path)
-{
-	std::string result;
-	std::ifstream stream(path);
-
+inline std::string readFileAsString(const std::string& path) {
+	const std::ifstream stream(path);
 	if (!stream.is_open()) {
 		std::cout << "Could not open file " << path << '\n';
 		return "";
 	}
+	std::stringstream buffer;
+	buffer << stream.rdbuf();
+	return buffer.str();
+}
 
-	std::string line;
-	while (std::getline(stream, line))
-	{
-		result.append(line);
-		result.append("\n");
+inline std::vector<std::string> readFileAsLines(const std::string& path) {
+	std::vector<std::string> result;
+	
+	std::ifstream stream(path);
+	if (!stream.is_open()) {
+		std::cout << "Could not open file " << path << '\n';
+		return {};
 	}
-
+	std::string line;
+	while (std::getline(stream, line)) {
+		result.push_back(line);
+	}
 	return result;
 }
 

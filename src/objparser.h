@@ -1,9 +1,6 @@
 #pragma once
 
-#include <iostream>
-#include <fstream>
 #include <string>
-#include <string_view>
 #include "glm/glm.hpp"
 #include "model.h"
 
