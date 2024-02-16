@@ -2,7 +2,7 @@
 #include <glad/glad.h>
 #include <iostream>
 
-ShaderProgram ShaderProgram::Compile(std::string vertexShaderSource, std::string fragmentShaderSource)
+ShaderProgram ShaderProgram::Compile(const std::string& vertexShaderSource, const std::string& fragmentShaderSource)
 {
 	int  success;
 	char infoLog[1024];
@@ -40,7 +40,7 @@ ShaderProgram ShaderProgram::Compile(std::string vertexShaderSource, std::string
 	return ShaderProgram(shaderProgram);
 }
 
-int ShaderProgram::GetPramLocation(const std::string& paramName)
+int ShaderProgram::GetPramLocation(const std::string& paramName) const
 {
 	return glGetUniformLocation(m_programId, paramName.c_str());
 }

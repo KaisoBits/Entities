@@ -7,9 +7,9 @@ class ShaderProgram
 public:
 	ShaderProgram() = delete;
 
-	static ShaderProgram Compile(std::string vertexShaderSource, std::string fragmentShaderSource);
+	static ShaderProgram Compile(const std::string& vertexShaderSource, const std::string& fragmentShaderSource);
 
-	int GetPramLocation(const std::string& paramName);
+	int GetPramLocation(const std::string& paramName) const;
 	void Use() const;
 
 	unsigned int GetId() const { return m_programId; }

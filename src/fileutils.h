@@ -1,5 +1,4 @@
-#ifndef FILEUTILS_H
-#define FILEUTILS_H
+#pragma once
 
 #include <string>
 #include <string_view>
@@ -37,11 +36,9 @@ inline std::ifstream readFileAsStream(const std::string& path)
 	return stream;
 }
 
-inline int getFileSize(const std::string& path)
+inline std::streamoff getFileSize(const std::string& path)
 {
 	std::ifstream fileStream(path, std::ios::binary | std::ios::ate);
 
 	return fileStream.tellg();
 }
-
-#endif

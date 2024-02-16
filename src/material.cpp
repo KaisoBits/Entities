@@ -6,7 +6,7 @@
 
 void Material::AddTexture(const Texture& texture)
 {
-	int index = m_textures.size();
+	int index = static_cast<int>(m_textures.size());
 	std::string uniformName = "texture" + std::to_string(index);
 	m_textures.push_back(texture);
 

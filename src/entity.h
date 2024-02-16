@@ -33,7 +33,7 @@ public:
 	void Update(float deltaTime);
 
 	void SetUpdateFunc(
-		std::function<void(Entity* entity, float deltaTime)> updateFunc);
+		std::function<void(Entity* entity, const float deltaTime)> updateFunc);
 
 private:
 	void ApplyPositionAndRotation() const;

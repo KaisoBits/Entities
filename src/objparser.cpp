@@ -19,12 +19,12 @@ Model ObjParser::LoadFromFile(const std::string& filePath)
 	std::ifstream fileStream = readFileAsStream(filePath);
 	if (fileStream.bad())
 	{
-		std::cout << "Failed to load the model data" << std::endl;
+		std::cout << "Failed to load the model data\n";
 		throw 1;
 	}
 
 	int fileSize = getFileSize(filePath);
-	std::cout << "  Size: " << fileSize / 1024.0f << "KiB" << std::endl;
+	std::cout << "  Size: " << fileSize / 1024.0f << "KiB\n";
 
 	int read = 0;
 
@@ -40,7 +40,7 @@ Model ObjParser::LoadFromFile(const std::string& filePath)
 			continue;
 
 		const std::vector tokens = TokenizeString(s, ' ');
-		if (tokens.size() < 1)
+		if (tokens.empty())
 			continue;
 
 		if (tokens[0] == "v")
@@ -51,7 +51,7 @@ Model ObjParser::LoadFromFile(const std::string& filePath)
 				continue;
 			}
 
-			vertices.push_back(glm::vec3(std::stof(tokens[1]), std::stof(tokens[2]), std::stof(tokens[3])));
+			vertices.emplace_back(std::stof(tokens[1]), std::stof(tokens[2]), std::stof(tokens[3]));
 		}
 		else if (tokens[0] == "vn")
 		{
@@ -61,7 +61,7 @@ Model ObjParser::LoadFromFile(const std::string& filePath)
 				continue;
 			}
 
-			normal.push_back(glm::vec3(std::stof(tokens[1]), std::stof(tokens[2]), std::stof(tokens[3])));
+			normal.emplace_back(std::stof(tokens[1]), std::stof(tokens[2]), std::stof(tokens[3]));
 		}
 		else if (tokens[0] == "vt")
 		{
@@ -71,7 +71,7 @@ Model ObjParser::LoadFromFile(const std::string& filePath)
 				continue;
 			}
 
-			uv.push_back(glm::vec2(std::stof(tokens[1]), std::stof(tokens[2])));
+			uv.emplace_back(std::stof(tokens[1]), std::stof(tokens[2]));
 		}
 		else if (tokens[0] == "f")
 		{
@@ -101,11 +101,11 @@ Model ObjParser::LoadFromFile(const std::string& filePath)
 			std::cout << "\r  Loaded: " << (static_cast<float>(read) / static_cast<float>(fileSize)) * 100 << "%       ";
 	}
 
-	std::cout << "\r  Loaded: 100.00%     " << std::endl;
+	std::cout << "\r  Loaded: 100.00%     \n";
 
 	Model model = Model::Create(FlattenVector3(endVertices), FlattenVector2(endUv), FlattenVector3(endNormal));
 
-	std::cout << "  Model loaded: " << filePath << std::endl;
+	std::cout << "  Model loaded: " << filePath << '\n';
 
 	return model;
 }

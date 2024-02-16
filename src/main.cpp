@@ -20,19 +20,18 @@
 
 using namespace std::chrono_literals;
 
-const int windowWidth = 800;
-const int windowHeight = 600;
+constexpr int windowWidth = 800;
+constexpr int windowHeight = 600;
 
-const float cameraSpeed = 60.0f;
-const float mouseSensitivity = 0.2f;
+constexpr float cameraSpeed = 60.0f;
+constexpr float mouseSensitivity = 0.2f;
 
 void windowSizeChangeCallback(GLFWwindow* window, int newWidth, int newHeight);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 void handleCameraMovement(GLFWwindow* window, float deltaTime);
-void updateTimeUniform();
 
-Camera mainCam(75, (float)windowWidth / windowHeight);
+Camera mainCam(75, static_cast<float>(windowWidth) / windowHeight);
 
 int main()
 {
@@ -52,7 +51,7 @@ int main()
 
 	glfwMakeContextCurrent(window);
 
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
 	{
 		return -3;
 	}
@@ -76,14 +75,14 @@ int main()
 	{
 		for (int j = 0; j < 10; j++)
 		{
-			float value = (i + j) / 2.0f;
+			float value = static_cast<float>(i + j) / 2.0f;
 
 			Entity e(&model, material1);
 			e.SetPosition(glm::vec3(i * 20, 0, j * 20));
 			e.SetScale(glm::vec3(5));
 			e.SetUpdateFunc(
 				[value](Entity* e, float deltaTime) mutable {
-					const float animationHeight = 10.0f;
+					constexpr float animationHeight = 10.0f;
 
 					glm::vec3 position = e->GetPosition();
 					position.y = sin(value) * animationHeight;
@@ -117,22 +116,20 @@ int main()
 	glClearColor(60.0f / 255, 60.0f / 255, 60.0f / 255, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 
-	float lastTime = glfwGetTime();
+	double lastTime = glfwGetTime();
 	while (!glfwWindowShouldClose(window))
 	{
-		float now = glfwGetTime();
-		float deltaTime = fmin(now - lastTime, 0.3f);
+		double now = glfwGetTime();
+		double deltaTime = fmin(now - lastTime, 0.3f);
 		lastTime = now;
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		handleCameraMovement(window, deltaTime);
-
-		updateTimeUniform();
+		handleCameraMovement(window, static_cast<float>(deltaTime));
 
 		for (auto& entity : entities)
 		{
-			entity.Update(deltaTime);
+			entity.Update(static_cast<float>(deltaTime));
 			entity.Draw(mainCam);
 		}
 
@@ -149,18 +146,18 @@ int main()
 
 void handleCameraMovement(GLFWwindow* window, float deltaTime)
 {
-	const glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+	constexpr glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 
 	glm::vec3 position = mainCam.GetPosition();
 
-	glm::vec3 forwardVectorJustYaw = mainCam.ForwardJustYaw();
+	const glm::vec3 forwardVectorJustYaw = mainCam.ForwardJustYaw();
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		position += forwardVectorJustYaw * deltaTime * cameraSpeed;
 	else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		position -= forwardVectorJustYaw * deltaTime * cameraSpeed;
 
-	glm::vec3 right = glm::cross(forwardVectorJustYaw, up);
+	const glm::vec3 right = glm::cross(forwardVectorJustYaw, up);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		position += right * deltaTime * cameraSpeed;
 	else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
@@ -182,7 +179,7 @@ void windowSizeChangeCallback(GLFWwindow* window, int newWidth, int newHeight)
 		return;
 
 	glViewport(0, 0, newWidth, newHeight);
-	mainCam.SetAspectRatio((float)newWidth / newHeight);
+	mainCam.SetAspectRatio(static_cast<float>(newWidth) / static_cast<float>(newHeight));
 }
 
 double lastX = -1;
@@ -199,25 +196,11 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 	glm::vec2 camRotation = mainCam.GetRotation();
 
-	camRotation.x += (xpos - lastX) * mouseSensitivity;
-	camRotation.y = fmin(fmax(camRotation.y + (ypos - lastY) * mouseSensitivity, -89.0f), 89.0f);
+	camRotation.x += static_cast<float>(xpos - lastX) * mouseSensitivity;
+	camRotation.y = fmin(fmax(camRotation.y + static_cast<float>(ypos - lastY) * mouseSensitivity, -89.0f), 89.0f);
 
 	mainCam.SetRotation(camRotation);
 
 	lastX = xpos;
 	lastY = ypos;
-}
-
-void updateTimeUniform()
-{
-	GLint id;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &id);
-
-	int location = glGetUniformLocation(id, "time");
-	if (location >= 0)
-	{
-		float time = (float)glfwGetTime();
-
-		glUniform1f(location, time);
-	}
 }

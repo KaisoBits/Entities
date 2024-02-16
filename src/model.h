@@ -11,9 +11,9 @@ public:
 	void Draw() const;
 
 private:
-	Model(unsigned int buffer, unsigned int verticesCount) : 
+	Model(unsigned int buffer, unsigned long long verticesCount) : 
 		m_buffer(buffer), m_verticesCount(verticesCount) {}
 
-	const unsigned int m_buffer;
-	const unsigned int m_verticesCount;
+	unsigned int m_buffer;
+	unsigned long long m_verticesCount;
 };

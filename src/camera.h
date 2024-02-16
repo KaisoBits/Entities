@@ -10,7 +10,7 @@ public:
 
 	glm::mat4 GetMatrix() const
 	{
-		glm::mat4 viewMatrix =
+		const glm::mat4 viewMatrix =
 			glm::translate(
 				glm::rotate(
 					glm::rotate(
@@ -23,19 +23,19 @@ public:
 		return viewMatrix;
 	}
 
-	glm::vec2 GetRotation() const { return m_rotation; }
+	[[nodiscard]] glm::vec2 GetRotation() const { return m_rotation; }
 	void SetRotation(glm::vec2 rotation) { m_rotation = rotation; }
 
-	glm::vec3 GetPosition() const { return m_position; }
+	[[nodiscard]] glm::vec3 GetPosition() const { return m_position; }
 	void SetPosition(glm::vec3 position) { m_position = position; }
 
-	float GetFovY() const { return m_fovY; }
+	[[nodiscard]] float GetFovY() const { return m_fovY; }
 	void SetFovY(float fovY) { m_fovY = fovY; }
 
-	float GetAspectRatio() const { return m_aspectRatio; }
+	[[nodiscard]] float GetAspectRatio() const { return m_aspectRatio; }
 	void SetAspectRatio(float aspectRatio) { m_aspectRatio = aspectRatio; }
 
-	glm::vec3 Forward() 
+	[[nodiscard]] glm::vec3 Forward() 
 	{
 		glm::vec3 forwardVector(
 			cos(glm::radians(m_rotation.x + 90)) * cos(glm::radians(m_rotation.y)),
@@ -44,7 +44,7 @@ public:
 		return glm::normalize(-forwardVector);
 	}
 
-	glm::vec3 ForwardJustYaw()
+	[[nodiscard]] glm::vec3 ForwardJustYaw()
 	{
 		glm::vec3 forwardVectorJustYaw(
 			cos(glm::radians(m_rotation.x + 90)),
@@ -53,17 +53,17 @@ public:
 		return glm::normalize(-forwardVectorJustYaw);
 	}
 
-	glm::vec3 Up()
+	[[nodiscard]] glm::vec3 Up()
 	{
-		return glm::vec3(0, 1, 0);
+		return {0, 1, 0};
 	}
 
-	glm::vec3 Right()
+	[[nodiscard]] glm::vec3 Right()
 	{
 		return glm::cross(ForwardJustYaw(), Up());
 	}
 
-	void Apply(int shaderId) const
+	void Apply(unsigned int shaderId) const
 	{
 		int viewMatrixLocation = glGetUniformLocation(shaderId, "view");
 		if (viewMatrixLocation >= 0)
