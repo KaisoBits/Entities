@@ -13,12 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\shaders">
-      <UniqueIdentifier>{f5e1e95f-2ac3-4fae-b757-a122be4aedcb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{d481ec77-3632-4080-a7ca-34229288c13c}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -50,7 +44,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\vertexShader.glsl" />
     <None Include="shaders/**" />
     <None Include="shaders/**" />
     <None Include="shaders/**" />
@@ -61,6 +54,7 @@
     <None Include="shaders/**">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shaders/**" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="material.h">
