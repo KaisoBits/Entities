@@ -22,11 +22,16 @@ void Entity::ApplyPositionAndRotation() const
 	int modelMatrixLocation = glGetUniformLocation(m_material.GetShaderId(), "model");
 	if (modelMatrixLocation >= 0)
 	{
-		glm::mat4 modelMatrix = glm::scale(
+		glm::mat4 modelMatrix =
+			glm::scale(
+				glm::rotate(
+					glm::rotate(
 			glm::rotate(
 				glm::translate(glm::mat4(1.0f), m_position),
-				m_rotation.y,
-				glm::vec3(0.0f, 1.0f, 0.0f)),
+							m_rotation.y, glm::vec3(0.0f, 1.0f, 0.0f)),
+						m_rotation.z, glm::vec3(0.0f, 0.0f, 1.0f)
+					),
+					m_rotation.x, glm::vec3(1.0f, 0.0f, 0.0f)),
 			m_scale);
 
 		glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
