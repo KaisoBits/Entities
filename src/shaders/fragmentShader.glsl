@@ -6,8 +6,6 @@ in vec2 textureCoord;
 in vec3 fragmentPosition;
 in vec3 normalVector;
 
-uniform vec4 color = vec4(1.0, 0.0, 0.0, 1.0);
-
 uniform sampler2D texture0;
 
 uniform vec3 cameraPosition;
