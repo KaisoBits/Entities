@@ -8,14 +8,9 @@ uniform mat4 model = mat4(1);
 uniform mat4 view = mat4(1);
 uniform mat4 perspective = mat4(1);
 
-uniform vec3 sunDirectionVector = vec3(0.5, -1, 0);
-
 out vec2 textureCoord;
-out float sunStrength;
-
-float map(float value, float min1, float max1, float min2, float max2) {
-  return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
-}
+out vec3 fragmentPosition;
+out vec3 normalVector;
 
 void main()
 {
@@ -23,9 +18,7 @@ void main()
 
 	vec4 modelPos = model * vec4(position, 1.0);
 	gl_Position = perspective * view * modelPos;
+	fragmentPosition = vec3(modelPos);
 
-	vec3 normalRotationOnly = mat3(transpose(inverse(model))) * normal;
-
-	float dotResult = dot(normalize(normalRotationOnly), normalize(sunDirectionVector));
-	sunStrength = max(map(dotResult, -1, -0.1, 1.5, 0), 0);
+	normalVector = normalize(mat3(transpose(inverse(model))) * normal);
 }

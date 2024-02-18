@@ -35,7 +35,7 @@ public:
 	[[nodiscard]] float GetAspectRatio() const { return m_aspectRatio; }
 	void SetAspectRatio(float aspectRatio) { m_aspectRatio = aspectRatio; }
 
-	[[nodiscard]] glm::vec3 Forward() 
+	[[nodiscard]] glm::vec3 Forward()
 	{
 		glm::vec3 forwardVector(
 			cos(glm::radians(m_rotation.x + 90)) * cos(glm::radians(m_rotation.y)),
@@ -55,7 +55,7 @@ public:
 
 	[[nodiscard]] glm::vec3 Up()
 	{
-		return {0, 1, 0};
+		return { 0, 1, 0 };
 	}
 
 	[[nodiscard]] glm::vec3 Right()
@@ -80,6 +80,12 @@ public:
 				glm::perspective(glm::radians(m_fovY), m_aspectRatio, 0.1f, 1000.0f);
 
 			glUniformMatrix4fv(perspectiveMatrixLocation, 1, GL_FALSE, glm::value_ptr(perspective));
+		}
+
+		int positionLocation = glGetUniformLocation(shaderId, "cameraPosition");
+		if (positionLocation >= 0)
+		{
+			glUniform3fv(positionLocation, 1, &m_position[0]);
 		}
 	}
 
