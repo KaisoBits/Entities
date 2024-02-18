@@ -26,7 +26,7 @@ float getDiffuseLightStrength() {
 }
 
 float getSpecularLightStrength() {
-	float strength = 0.5;
+	float strength = 0.4;
 
 	vec3 viewingDirection = normalize(cameraPosition - fragmentPosition);
 	vec3 reflectDirection = reflect(normalize(sunDirectionVector), normalVector);
