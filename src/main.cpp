@@ -98,6 +98,13 @@ int main()
 		}
 	}
 
+	constexpr Sun sun = {
+		.direction = glm::vec3(0.5, -1, 0),
+		.ambient = glm::vec3(0.07f),
+		.diffuse = glm::vec3(1.35f, 1.25f, 1.0f),
+		.specular = glm::vec3(0.5f)
+	};
+
 	const Model groundModel = ObjParser::LoadFromFile("resources/models/ground.obj");
 	Material groundMaterial(sp);
 	const Texture groundTexture = Texture::LoadFromFile("resources/textures/ground_color.jpg");
@@ -135,7 +142,7 @@ int main()
 		for (auto& entity : entities)
 		{
 			entity.Update(static_cast<float>(deltaTime));
-			entity.Draw(mainCam);
+			entity.Draw(mainCam, sun);
 		}
 
 		glfwSwapBuffers(window);

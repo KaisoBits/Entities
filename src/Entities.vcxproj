@@ -151,11 +151,11 @@
     <ClCompile Include="shaderprogram.cpp" />
     <ClCompile Include="texture.cpp" />
   </ItemGroup>
-	<ItemGroup>
-		<EmbeddedResource Include="shaders/**" >
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</EmbeddedResource>
-	</ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="shaders/**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="entity.h" />
@@ -163,6 +163,7 @@
     <ClInclude Include="model.h" />
     <ClInclude Include="objparser.h" />
     <ClInclude Include="shaderprogram.h" />
+    <ClInclude Include="sun.h" />
     <ClInclude Include="texture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
