@@ -26,10 +26,31 @@ Texture Texture::LoadFromFile(const std::string& path)
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
-	if (channelsCount == 4)
+	if (channelsCount == 1)
+	{
+		// Grayscale to rgb
+		size_t dataSize = width * height;
+		auto rgbImageData = new unsigned char[dataSize * 3];
+
+		for (int i = 0; i < dataSize; ++i)
+		{
+			rgbImageData[i * 3 + 0] = imageData[i]; // R
+			rgbImageData[i * 3 + 1] = imageData[i]; // G
+			rgbImageData[i * 3 + 2] = imageData[i]; // B
+		}
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, rgbImageData);
+
+		delete[] rgbImageData;
+	}
+	else if (channelsCount == 4)
+	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+	}
 	else
+	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+	}
 
 	glGenerateMipmap(GL_TEXTURE_2D);
 
