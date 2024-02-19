@@ -23,7 +23,7 @@ using namespace std::chrono_literals;
 constexpr int windowWidth = 800;
 constexpr int windowHeight = 600;
 
-constexpr float cameraSpeed = 60.0f;
+constexpr float cameraSpeed = 20.0f;
 constexpr float mouseSensitivity = 0.1f;
 
 void windowSizeChangeCallback(GLFWwindow* window, int newWidth, int newHeight);
@@ -65,10 +65,12 @@ int main()
 	std::string fragmentShader = readFileAsString("shaders/fragmentShader.glsl");
 
 	const ShaderProgram sp = ShaderProgram::Compile(vertexShader, fragmentShader);
-	const Model model = ObjParser::LoadFromFile("resources/models/monkey.obj");
+	const Model model = ObjParser::LoadFromFile("resources/models/cube.obj");
 	Material material1(sp);
-	const Texture textureCat = Texture::LoadFromFile("resources/textures/ground_color.jpg");
-	material1.AddTexture(textureCat);
+	const Texture textureColor = Texture::LoadFromFile("resources/textures/container_color.png");
+	const Texture textureSpecular = Texture::LoadFromFile("resources/textures/container_specular.png");
+	material1.AddTexture(textureColor);
+	material1.SetSpecularMap(&textureSpecular);
 
 	std::vector<Entity> entities;
 
@@ -89,7 +91,7 @@ int main()
 					position.y = sin(value) * animationHeight;
 					// e->SetPosition(position);
 
-					e->SetRotation(glm::vec3(0, value / 3.0f, 0));
+					e->SetRotation(glm::vec3(value / 6.0, value / 8.0f, value / 10.0f));
 
 					value += 2.0f * deltaTime;
 				});
@@ -100,15 +102,17 @@ int main()
 
 	constexpr Sun sun = {
 		.direction = glm::vec3(0.5, -1, 0),
-		.ambient = glm::vec3(0.07f),
-		.diffuse = glm::vec3(1.35f, 1.25f, 1.0f),
-		.specular = glm::vec3(0.5f)
+		.ambient = glm::vec3(0.1f),
+		.diffuse = glm::vec3(0.8f),
+		.specular = glm::vec3(2.0f)
 	};
 
 	const Model groundModel = ObjParser::LoadFromFile("resources/models/ground.obj");
 	Material groundMaterial(sp);
 	const Texture groundTexture = Texture::LoadFromFile("resources/textures/ground_color.jpg");
+	const Texture groundSpecTexture = Texture::LoadFromFile("resources/textures/ground_spec.jpg");
 	groundMaterial.AddTexture(groundTexture);
+	groundMaterial.SetSpecularMap(&groundSpecTexture);
 	Entity groundEntity(&groundModel, groundMaterial);
 	groundEntity.SetPosition(glm::vec3(100, -15, 100));
 	groundEntity.SetScale(glm::vec3(20, 1, 20));

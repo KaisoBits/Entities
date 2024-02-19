@@ -26,11 +26,11 @@ public:
 	void SetAmbient(const glm::vec3& ambient) { m_ambient = ambient; }
 	[[nodiscard]] glm::vec3 GetAmbient() const { return m_ambient; }
 
-	void SetDiffuse(const glm::vec3& diffuse) { m_diffuse = diffuse; }
-	[[nodiscard]] glm::vec3 GetDiffuse() const { return m_diffuse; }
+	void SetDiffuseMap(const Texture* diffuseMap) { m_diffuseMap = diffuseMap; }
+	[[nodiscard]] const Texture* GetDiffuseMap() const { return m_diffuseMap; }
 
-	void SetSpecular(const glm::vec3& specular) { m_specular = specular; }
-	[[nodiscard]] glm::vec3 GetSpecular() const { return m_specular; }
+	void SetSpecularMap(const Texture* specularMap) { m_specularMap = specularMap; }
+	[[nodiscard]] const Texture* GetSpecularMap() const { return m_specularMap; }
 
 	void SetShininess(float shininess) { m_shininess = shininess; }
 	[[nodiscard]] float GetShininess() const { return m_shininess; }
@@ -44,12 +44,18 @@ private:
 	std::vector<Texture> m_textures;
 	std::map<int, float> m_floatUniforms;
 	std::map<int, glm::vec4> m_vec4Uniforms;
+
 	glm::vec3 m_ambient{ 1.f, 1.f, 1.f };
 	int m_ambientLocation = -1;
-	glm::vec3 m_diffuse{ 1.f, 1.f, 1.f };
-	int m_diffuseLocation = -1;
-	glm::vec3 m_specular{ 1.f, 1.f, 1.f };
-	int m_specularLocation = -1;
+
+	const Texture* m_diffuseMap = nullptr;
+	int m_diffuseMapLocation = -1;
+	int m_diffuseOverrideLocation = -1;
+
+	const Texture* m_specularMap = nullptr;
+	int m_specularMapLocation = -1;
+	int m_specularOverrideLocation = -1;
+
 	float m_shininess{ 32 };
 	int m_shininessLocation = -1;
 
