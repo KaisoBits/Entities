@@ -21,16 +21,20 @@ Texture Texture::LoadFromFile(const std::string& path)
 	}
 
 	std::cout << "  Loaded from file\n";
-	
+
 	unsigned int texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+	if (channelsCount == 4)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+	else
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	std::cout << "  Sent to GPU\n";
-	
+
 	stbi_image_free(imageData);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
