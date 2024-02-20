@@ -76,8 +76,10 @@ void main()
 	// Point light
 	float distanceToPointLight = distance(fragmentPosition, pointLight.position);
 	float attenuation = getAttenuation(distanceToPointLight);
-	vec3 diffusePointLight = pointLight.diffuse * attenuation * getDiffuseLightStrength(fragmentPosition - pointLight.position) * diffuseMaterialStrength;
-	vec3 specularPointLight = pointLight.specular * attenuation * getSpecularLightStrength(fragmentPosition - pointLight.position)  * specularMaterialStrength;
+	vec3 diffusePointLight = pointLight.diffuse * attenuation * 
+		getDiffuseLightStrength(fragmentPosition - pointLight.position) * diffuseMaterialStrength;
+	vec3 specularPointLight = pointLight.specular * attenuation * 
+		getSpecularLightStrength(fragmentPosition - pointLight.position)  * specularMaterialStrength;
 
 	vec3 sunLight = ambientLight + diffuseLight + specularLight;
 	vec3 pointLight = diffusePointLight + specularPointLight;
