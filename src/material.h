@@ -8,6 +8,7 @@
 #include "shaderprogram.h"
 #include "texture.h"
 #include "sun.h"
+#include "pointlight.h"
 
 class Material
 {
@@ -18,7 +19,7 @@ public:
 	void SetFloat(const std::string& paramName, float value);
 	void SetVec4(const std::string& paramName, glm::vec4 value);
 
-	void Use(const Sun& sun) const;
+	void Use(const Sun& sun, const PointLight& pointLight) const;
 
 	unsigned int GetShaderId() const { return m_shader.GetId(); }
 
@@ -39,6 +40,7 @@ private:
 	void ApplyUniforms() const;
 	void ApplyTextures() const;
 	void ApplySun(const Sun& sun) const;
+	void ApplyPointLight(const PointLight& pointLight) const;
 
 	std::map<int, float> m_floatUniforms;
 	std::map<int, glm::vec4> m_vec4Uniforms;
@@ -61,6 +63,13 @@ private:
 	int m_sunAmbientLocation = -1;
 	int m_sunDiffuseLocation = -1;
 	int m_sunSpecularLocation = -1;
+
+	int m_pointLightPositionLocation = -1;
+	int m_pointLightDiffuseLocation = -1;
+	int m_pointLightSpecularLocation = -1;
+	int m_pointLightConstantLocation = -1;
+	int m_pointLightLinearLocation = -1;
+	int m_pointLightQuadraticLocation = -1;
 
 	ShaderProgram m_shader;
 };

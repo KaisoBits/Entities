@@ -101,14 +101,24 @@ int main()
 	}
 
 	constexpr Sun sun = {
-		.direction = glm::vec3(0.5, -1, 0),
-		.ambient = glm::vec3(0.1f),
-		.diffuse = glm::vec3(1.2f),
-		.specular = glm::vec3(2.0f)
+		.direction = glm::vec3(1.0, -1, 0),
+		.ambient = glm::vec3(0.02f),
+		.diffuse = glm::vec3(0.2f),
+		.specular = glm::vec3(0.1f)
+	};
+
+	PointLight pointLight = {
+		.position = glm::vec3(0),
+		.diffuse = glm::vec3(40.0f),
+		.specular = glm::vec3(40.0f),
+		.constant = 1.0f,
+		.linear = 5.8f,
+		.quadratic = 3.5f,
 	};
 
 	const Model groundModel = ObjParser::LoadFromFile("resources/models/ground.obj");
 	Material groundMaterial(sp);
+	groundMaterial.SetShininess(16);
 	const Texture groundTexture = Texture::LoadFromFile("resources/textures/ground_color.jpg");
 	const Texture groundSpecTexture = Texture::LoadFromFile("resources/textures/ground_spec.jpg");
 	groundMaterial.SetDiffuseMap(&groundTexture);
@@ -142,11 +152,12 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		handleCameraMovement(window, static_cast<float>(deltaTime));
+		pointLight.position = mainCam.GetPosition();
 
 		for (auto& entity : entities)
 		{
 			entity.Update(static_cast<float>(deltaTime));
-			entity.Draw(mainCam, sun);
+			entity.Draw(mainCam, sun, pointLight);
 		}
 
 		glfwSwapBuffers(window);

@@ -28,31 +28,57 @@ struct Sun
 };
 uniform Sun sun;
 
-float getDiffuseLightStrength() {
-	float dotResult = dot(normalVector, -normalize(sun.direction));
+struct PointLight
+{
+	vec3 position;
+
+	vec3 diffuse;
+	vec3 specular;
+
+	float constant;
+	float linear;
+	float quadratic;
+};
+uniform PointLight pointLight;
+
+float getDiffuseLightStrength(vec3 lightDirection) {
+	float dotResult = dot(normalVector, -normalize(lightDirection));
 	return max(dotResult, 0);
 }
 
-float getSpecularLightStrength() {
+float getSpecularLightStrength(vec3 lightDirection) {
 	vec3 viewingDirection = normalize(cameraPosition - fragmentPosition);
-	vec3 reflectDirection = reflect(normalize(sun.direction), normalVector);
+	vec3 reflectDirection = reflect(normalize(lightDirection), normalVector);
 	float specLight = pow(max(dot(viewingDirection, reflectDirection), 0.0), material.shininess);
 	return specLight;
 }
 
+float getAttenuation(float dist)
+{
+	return 1.0 / (pointLight.constant + pointLight.linear * dist + pointLight.quadratic * dist);
+}
+
 void main()
 {
-	vec3 diffuseStrength = material.diffuseOverride ? 
+	// Sample material
+	vec3 diffuseMaterialStrength = material.diffuseOverride ? 
 		material.color : vec3(texture(material.diffuseMap, textureCoord)) * material.color;
-
-	vec3 ambientLight = sun.ambient * diffuseStrength;
-	vec3 diffuseLight = sun.diffuse * getDiffuseLightStrength() * diffuseStrength;
-
-	vec3 specularStrength = material.specularOverride ? 
+	vec3 specularMaterialStrength = material.specularOverride ? 
 		vec3(0.5) : vec3(texture(material.specularMap, textureCoord));
-	vec3 specularLight = sun.specular * getSpecularLightStrength() * specularStrength;
 
-	vec4 light = vec4(ambientLight + diffuseLight + specularLight, 1.0);
+	// Sun light
+	vec3 ambientLight = sun.ambient * diffuseMaterialStrength;
+	vec3 diffuseLight = sun.diffuse * getDiffuseLightStrength(sun.direction) * diffuseMaterialStrength;
+	vec3 specularLight = sun.specular * getSpecularLightStrength(sun.direction) * specularMaterialStrength;
 
-	FragColor = light;
+	// Point light
+	float distanceToPointLight = distance(fragmentPosition, pointLight.position);
+	float attenuation = getAttenuation(distanceToPointLight);
+	vec3 diffusePointLight = pointLight.diffuse * attenuation * getDiffuseLightStrength(fragmentPosition - pointLight.position) * diffuseMaterialStrength;
+	vec3 specularPointLight = pointLight.specular * attenuation * getSpecularLightStrength(fragmentPosition - pointLight.position)  * specularMaterialStrength;
+
+	vec3 sunLight = ambientLight + diffuseLight + specularLight;
+	vec3 pointLight = diffusePointLight + specularPointLight;
+
+	FragColor = vec4(sunLight + pointLight, 1.0);
 }

@@ -44,10 +44,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders/**" />
-    <None Include="shaders/**" />
-    <None Include="shaders/**" />
     <None Include="shaders\vertexShader.glsl" />
+    <None Include="shaders/**" />
+    <None Include="shaders/**" />
     <None Include="shaders/**">
       <Filter>Shaders</Filter>
     </None>
@@ -78,5 +77,15 @@
     <ClInclude Include="camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="sun.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pointlight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="shaders/**" />
+    <EmbeddedResource Include="shaders/**" />
   </ItemGroup>
 </Project>

@@ -36,6 +36,27 @@ void Material::ApplySun(const Sun& sun) const
 		glUniform3fv(m_sunSpecularLocation, 1, glm::value_ptr(sun.specular));
 }
 
+void Material::ApplyPointLight(const PointLight& pointLight) const
+{
+	if (m_pointLightPositionLocation >= 0)
+		glUniform3fv(m_pointLightPositionLocation, 1, &pointLight.position[0]);
+
+	if (m_pointLightDiffuseLocation >= 0)
+		glUniform3fv(m_pointLightDiffuseLocation, 1, &pointLight.diffuse[0]);
+
+	if (m_pointLightSpecularLocation >= 0)
+		glUniform3fv(m_pointLightSpecularLocation, 1, &pointLight.specular[0]);
+
+	if (m_pointLightConstantLocation >= 0)
+		glUniform1f(m_pointLightConstantLocation, pointLight.constant);
+
+	if (m_pointLightLinearLocation >= 0)
+		glUniform1f(m_pointLightLinearLocation, pointLight.linear);
+
+	if (m_pointLightQuadraticLocation >= 0)
+		glUniform1f(m_pointLightQuadraticLocation, pointLight.quadratic);
+}
+
 void Material::InitializeStandardUniforms()
 {
 	m_shader.Use();
@@ -53,6 +74,13 @@ void Material::InitializeStandardUniforms()
 	m_sunAmbientLocation = m_shader.GetPramLocation("sun.ambient");
 	m_sunDiffuseLocation = m_shader.GetPramLocation("sun.diffuse");
 	m_sunSpecularLocation = m_shader.GetPramLocation("sun.specular");
+
+	m_pointLightPositionLocation = m_shader.GetPramLocation("pointLight.position");
+	m_pointLightDiffuseLocation = m_shader.GetPramLocation("pointLight.diffuse");
+	m_pointLightSpecularLocation = m_shader.GetPramLocation("pointLight.specular");
+	m_pointLightConstantLocation = m_shader.GetPramLocation("pointLight.constant");
+	m_pointLightLinearLocation = m_shader.GetPramLocation("pointLight.linear");
+	m_pointLightQuadraticLocation = m_shader.GetPramLocation("pointLight.quadratic");
 }
 
 void Material::ApplyUniforms() const
@@ -91,10 +119,11 @@ void Material::ApplyTextures() const
 	}
 }
 
-void Material::Use(const Sun& sun) const
+void Material::Use(const Sun& sun, const PointLight& pointLight) const
 {
 	m_shader.Use();
 	ApplyUniforms();
 	ApplyTextures();
 	ApplySun(sun);
+	ApplyPointLight(pointLight);
 }
