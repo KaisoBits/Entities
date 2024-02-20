@@ -55,7 +55,9 @@ float getSpecularLightStrength(vec3 lightDirection) {
 
 float getAttenuation(float dist)
 {
-	return 1.0 / (pointLight.constant + pointLight.linear * dist + pointLight.quadratic * dist);
+	return 1.0 / (pointLight.constant + 
+	pointLight.linear * dist + 
+	pointLight.quadratic * dist * dist);
 }
 
 void main()
