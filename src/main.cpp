@@ -103,7 +103,7 @@ int main()
 	constexpr Sun sun = {
 		.direction = glm::vec3(0.5, -1, 0),
 		.ambient = glm::vec3(0.1f),
-		.diffuse = glm::vec3(0.8f),
+		.diffuse = glm::vec3(1.0f),
 		.specular = glm::vec3(2.0f)
 	};
 
