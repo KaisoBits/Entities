@@ -5,24 +5,6 @@
 
 #include "material.h"
 
-void Material::AddTexture(const Texture& texture)
-{
-	int index = static_cast<int>(m_textures.size());
-	std::string uniformName = "texture" + std::to_string(index);
-	m_textures.push_back(texture);
-
-	int location = m_shader.GetPramLocation(uniformName);
-	if (location >= 0)
-	{
-		m_shader.Use();
-		glUniform1i(location, index);
-	}
-	else
-	{
-		std::cout << "Attempted to add texture number " << index << " to material with shader with not enough samplers.\n";
-	}
-}
-
 void Material::SetFloat(const std::string& paramName, float value)
 {
 	int location = m_shader.GetPramLocation(paramName);
@@ -56,10 +38,14 @@ void Material::ApplySun(const Sun& sun) const
 
 void Material::InitializeStandardUniforms()
 {
-	m_ambientLocation = m_shader.GetPramLocation("material.ambient");
+	m_shader.Use();
+
+	m_colorLocation = m_shader.GetPramLocation("material.color");
 	m_diffuseMapLocation = m_shader.GetPramLocation("material.diffuseMap");
+	if (m_diffuseMapLocation >= 0) glUniform1i(m_diffuseMapLocation, 0);
 	m_diffuseOverrideLocation = m_shader.GetPramLocation("material.diffuseOverride");
 	m_specularMapLocation = m_shader.GetPramLocation("material.specularMap");
+	if (m_specularMapLocation >= 0) glUniform1i(m_specularMapLocation, 1);
 	m_specularOverrideLocation = m_shader.GetPramLocation("material.specularOverride");
 	m_shininessLocation = m_shader.GetPramLocation("material.shininess");
 
@@ -71,35 +57,14 @@ void Material::InitializeStandardUniforms()
 
 void Material::ApplyUniforms() const
 {
-	if (m_ambientLocation >= 0)
-		glUniform3fv(m_ambientLocation, 1, &m_ambient[0]);
+	if (m_colorLocation >= 0)
+		glUniform3fv(m_colorLocation, 1, &m_color[0]);
 
-	int pos = 0;
-	if (m_diffuseMapLocation >= 0 && m_diffuseMap)
-	{
-		glUniform1i(
-			m_diffuseMapLocation,
-			m_textures.size() + (pos++) /* diffuse gets appended at the end of the texture list*/);
-		if (m_diffuseOverrideLocation >= 0)
-			glUniform1i(m_diffuseOverrideLocation, GL_FALSE);
-	}
-	else if (m_diffuseOverrideLocation >= 0)
-	{
-		glUniform1i(m_diffuseOverrideLocation, GL_TRUE);
-	}
+	if (m_diffuseOverrideLocation >= 0)
+		glUniform1i(m_diffuseOverrideLocation, m_diffuseMap == nullptr);
 
-	if (m_specularMapLocation >= 0 && m_specularMap)
-	{
-		glUniform1i(
-			m_specularMapLocation,
-			m_textures.size() + (pos++) /* specular gets appended at the end of the texture list*/);
-		if (m_specularOverrideLocation >= 0)
-			glUniform1i(m_specularOverrideLocation, GL_FALSE);
-	}
-	else if (m_specularOverrideLocation >= 0)
-	{
-		glUniform1i(m_specularOverrideLocation, GL_TRUE);
-	}
+	if (m_specularOverrideLocation >= 0)
+		glUniform1i(m_specularOverrideLocation, m_specularMap == nullptr);
 
 	if (m_shininessLocation >= 0)
 		glUniform1f(m_shininessLocation, m_shininess);
@@ -113,23 +78,15 @@ void Material::ApplyUniforms() const
 
 void Material::ApplyTextures() const
 {
-	int n = 0;
-	for (const auto& texture : m_textures)
-	{
-		glActiveTexture(GL_TEXTURE0 + n);
-		texture.Use();
-		n++;
-	}
-
 	if (m_diffuseMap)
 	{
-		glActiveTexture(GL_TEXTURE0 + n);
+		glActiveTexture(GL_TEXTURE0);
 		m_diffuseMap->Use();
 	}
 
 	if (m_specularMap)
 	{
-		glActiveTexture(GL_TEXTURE0 + n);
+		glActiveTexture(GL_TEXTURE1);
 		m_specularMap->Use();
 	}
 }

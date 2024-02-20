@@ -69,7 +69,7 @@ int main()
 	Material material1(sp);
 	const Texture textureColor = Texture::LoadFromFile("resources/textures/container_color.png");
 	const Texture textureSpecular = Texture::LoadFromFile("resources/textures/container_specular.png");
-	material1.AddTexture(textureColor);
+	material1.SetDiffuseMap(&textureColor);
 	material1.SetSpecularMap(&textureSpecular);
 
 	std::vector<Entity> entities;
@@ -103,7 +103,7 @@ int main()
 	constexpr Sun sun = {
 		.direction = glm::vec3(0.5, -1, 0),
 		.ambient = glm::vec3(0.1f),
-		.diffuse = glm::vec3(1.0f),
+		.diffuse = glm::vec3(1.2f),
 		.specular = glm::vec3(2.0f)
 	};
 
@@ -111,7 +111,7 @@ int main()
 	Material groundMaterial(sp);
 	const Texture groundTexture = Texture::LoadFromFile("resources/textures/ground_color.jpg");
 	const Texture groundSpecTexture = Texture::LoadFromFile("resources/textures/ground_spec.jpg");
-	groundMaterial.AddTexture(groundTexture);
+	groundMaterial.SetDiffuseMap(&groundTexture);
 	groundMaterial.SetSpecularMap(&groundSpecTexture);
 	Entity groundEntity(&groundModel, groundMaterial);
 	groundEntity.SetPosition(glm::vec3(100, -15, 100));

@@ -15,7 +15,6 @@ public:
 	Material() = delete;
 	Material(ShaderProgram shader) : m_shader(shader) { InitializeStandardUniforms(); }
 
-	void AddTexture(const Texture& texture);
 	void SetFloat(const std::string& paramName, float value);
 	void SetVec4(const std::string& paramName, glm::vec4 value);
 
@@ -23,8 +22,8 @@ public:
 
 	unsigned int GetShaderId() const { return m_shader.GetId(); }
 
-	void SetAmbient(const glm::vec3& ambient) { m_ambient = ambient; }
-	[[nodiscard]] glm::vec3 GetAmbient() const { return m_ambient; }
+	void SetColor(glm::vec3 color) { m_color = color; }
+	[[nodiscard]] glm::vec3 GetColor() const { return m_color; }
 
 	void SetDiffuseMap(const Texture* diffuseMap) { m_diffuseMap = diffuseMap; }
 	[[nodiscard]] const Texture* GetDiffuseMap() const { return m_diffuseMap; }
@@ -41,12 +40,11 @@ private:
 	void ApplyTextures() const;
 	void ApplySun(const Sun& sun) const;
 
-	std::vector<Texture> m_textures;
 	std::map<int, float> m_floatUniforms;
 	std::map<int, glm::vec4> m_vec4Uniforms;
 
-	glm::vec3 m_ambient{ 1.f, 1.f, 1.f };
-	int m_ambientLocation = -1;
+	glm::vec3 m_color{ 1.f, 1.f, 1.f };
+	int m_colorLocation = -1;
 
 	const Texture* m_diffuseMap = nullptr;
 	int m_diffuseMapLocation = -1;

@@ -6,13 +6,11 @@ in vec2 textureCoord;
 in vec3 fragmentPosition;
 in vec3 normalVector;
 
-uniform sampler2D texture0;
-
 uniform vec3 cameraPosition;
 
 struct Material
 {
-	vec3 ambient;
+	vec3 color;
 	bool diffuseOverride;
 	sampler2D diffuseMap;
 	bool specularOverride;
@@ -44,17 +42,17 @@ float getSpecularLightStrength() {
 
 void main()
 {
-	vec3 ambientLight = sun.ambient * material.ambient;
-
 	vec3 diffuseStrength = material.diffuseOverride ? 
-		vec3(1) : vec3(texture(material.diffuseMap, textureCoord));
-	vec3 diffuse = sun.diffuse * getDiffuseLightStrength() * diffuseStrength;
+		material.color : vec3(texture(material.diffuseMap, textureCoord)) * material.color;
+
+	vec3 ambientLight = sun.ambient * diffuseStrength;
+	vec3 diffuseLight = sun.diffuse * getDiffuseLightStrength() * diffuseStrength;
 
 	vec3 specularStrength = material.specularOverride ? 
 		vec3(0.5) : vec3(texture(material.specularMap, textureCoord));
-	vec3 specular = sun.specular * getSpecularLightStrength() * specularStrength;
+	vec3 specularLight = sun.specular * getSpecularLightStrength() * specularStrength;
 
-	vec4 light = vec4(ambientLight + diffuse + specular, 1.0);
+	vec4 light = vec4(ambientLight + diffuseLight + specularLight, 1.0);
 
-	FragColor = texture(texture0, textureCoord) * light;
+	FragColor = light;
 }
