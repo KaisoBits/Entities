@@ -103,8 +103,8 @@ int main()
 	constexpr Sun sun = {
 		.direction = glm::vec3(1.0, -1, 0),
 		.ambient = glm::vec3(0.02f),
-		.diffuse = glm::vec3(0.2f),
-		.specular = glm::vec3(0.1f)
+		.diffuse = glm::vec3(0.3f),
+		.specular = glm::vec3(0.5f)
 	};
 
 	PointLight pointLight = {
@@ -112,8 +112,8 @@ int main()
 		.diffuse = glm::vec3(40.0f),
 		.specular = glm::vec3(40.0f),
 		.constant = 1.0f,
-		.linear = 5.8f,
-		.quadratic = 3.5f,
+		.linear = 0.8f,
+		.quadratic = 0.01f,
 	};
 
 	const Model groundModel = ObjParser::LoadFromFile("resources/models/ground.obj");
@@ -135,7 +135,7 @@ int main()
 	glfwSetWindowSizeCallback(window, windowSizeChangeCallback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 
-	glClearColor(160 / 255.0f, 217 / 255.0f, 239 / 255.0f, 1.0f);
+	glClearColor(160 / 7.0f / 255.0f, 217 / 7.0f / 255.0f, 239 / 7.0f / 255.0f, 1.0f);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
