@@ -22,7 +22,6 @@ Model ObjParser::LoadFromFile(const std::string& filePath)
 	std::vector<std::string> lines = readFileAsLines(filePath);
 	std::cout << "  Loaded data from file\n";
 
-
 	unsigned long long read = 0;
 	unsigned long long lineIndex = -1;
 	for (const std::string& line : lines)
@@ -42,7 +41,7 @@ Model ObjParser::LoadFromFile(const std::string& filePath)
 		{
 			if (tokens.size() != 4)
 			{
-				std::cout << "Invalid data read at line {" << line << "} when parsing " << filePath << '\n';
+				std::cout << "  Invalid data read at line {" << line << "} when parsing " << filePath << '\n';
 				continue;
 			}
 
@@ -52,7 +51,7 @@ Model ObjParser::LoadFromFile(const std::string& filePath)
 		{
 			if (tokens.size() != 4)
 			{
-				std::cout << "Invalid data read at line {" << line << "} when parsing " << filePath << '\n';
+				std::cout << "  Invalid data read at line {" << line << "} when parsing " << filePath << '\n';
 				continue;
 			}
 
@@ -62,7 +61,7 @@ Model ObjParser::LoadFromFile(const std::string& filePath)
 		{
 			if (tokens.size() != 3)
 			{
-				std::cout << "Invalid data read at line {" << line << "} when parsing " << filePath << '\n';
+				std::cout << "  Invalid data read at line {" << line << "} when parsing " << filePath << '\n';
 				continue;
 			}
 
@@ -72,7 +71,7 @@ Model ObjParser::LoadFromFile(const std::string& filePath)
 		{
 			if (tokens.size() != 4)
 			{
-				std::cout << "Invalid data read at line {" << line << "} when parsing " << filePath << '\n';
+				std::cout << "  Invalid data read at line {" << line << "} when parsing " << filePath << '\n';
 				continue;
 			}
 
