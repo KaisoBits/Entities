@@ -18,20 +18,41 @@
 #include "texture.h"
 #include "entity.h"
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 using namespace std::chrono_literals;
 
 constexpr int windowWidth = 800;
 constexpr int windowHeight = 600;
 
 constexpr float cameraSpeed = 20.0f;
+constexpr float cameraRunSpeed = 80.0f;
 constexpr float mouseSensitivity = 0.1f;
 
 void windowSizeChangeCallback(GLFWwindow* window, int newWidth, int newHeight);
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void mouseCallback(GLFWwindow* window, double xpos, double ypos);
+void handleKey(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 void handleCameraMovement(GLFWwindow* window, float deltaTime);
 
+void initImGui(GLFWwindow* window);
+void beginFrameImGui();
+void endFrameImGui();
+void cleanupImGui();
+bool imGuiMenuOpen = false;
+
 Camera mainCam(75, static_cast<float>(windowWidth) / windowHeight);
+
+PointLight pointLight = {
+	.position = glm::vec3(0),
+	.diffuse = glm::vec3(40.0f),
+	.specular = glm::vec3(40.0f),
+	.constant = 1.0f,
+	.linear = 0.8f,
+	.quadratic = 0.01f,
+};
 
 int main()
 {
@@ -107,15 +128,6 @@ int main()
 		.specular = glm::vec3(0.5f)
 	};
 
-	PointLight pointLight = {
-		.position = glm::vec3(0),
-		.diffuse = glm::vec3(40.0f),
-		.specular = glm::vec3(40.0f),
-		.constant = 1.0f,
-		.linear = 0.8f,
-		.quadratic = 0.01f,
-	};
-
 	const Model groundModel = ObjParser::LoadFromFile("resources/models/ground.obj");
 	Material groundMaterial(sp);
 	groundMaterial.SetShininess(16);
@@ -133,7 +145,9 @@ int main()
 
 	glViewport(0, 0, windowWidth, windowHeight);
 	glfwSetWindowSizeCallback(window, windowSizeChangeCallback);
-	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetCursorPosCallback(window, mouseCallback);
+	glfwSetKeyCallback(window, handleKey);
+	initImGui(window);
 
 	glClearColor(160 / 7.0f / 255.0f, 217 / 7.0f / 255.0f, 239 / 7.0f / 255.0f, 1.0f);
 
@@ -151,8 +165,11 @@ int main()
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		glfwPollEvents();
+
+		beginFrameImGui();
+
 		handleCameraMovement(window, static_cast<float>(deltaTime));
-		pointLight.position = mainCam.GetPosition();
 
 		for (auto& entity : entities)
 		{
@@ -160,40 +177,61 @@ int main()
 			entity.Draw(mainCam, sun, pointLight);
 		}
 
+		endFrameImGui();
+
 		glfwSwapBuffers(window);
-		glfwPollEvents();
 
 		std::this_thread::yield();
 	}
 
+	cleanupImGui();
 	glfwTerminate();
 
 	return 0;
 }
 
+void handleKey(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	// The ~ key
+	if (key == GLFW_KEY_GRAVE_ACCENT && action == GLFW_PRESS)
+	{
+		imGuiMenuOpen = !imGuiMenuOpen;
+		if (imGuiMenuOpen)
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		else
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+}
+
 void handleCameraMovement(GLFWwindow* window, float deltaTime)
 {
+	if (imGuiMenuOpen)
+		return;
+
 	constexpr glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	float speed = (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) ?
+		cameraRunSpeed : cameraSpeed;
 
 	glm::vec3 position = mainCam.GetPosition();
 
 	const glm::vec3 forwardVectorJustYaw = mainCam.ForwardJustYaw();
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		position += forwardVectorJustYaw * deltaTime * cameraSpeed;
+		position += forwardVectorJustYaw * deltaTime * speed;
 	else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		position -= forwardVectorJustYaw * deltaTime * cameraSpeed;
+		position -= forwardVectorJustYaw * deltaTime * speed;
 
 	const glm::vec3 right = glm::cross(forwardVectorJustYaw, up);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		position += right * deltaTime * cameraSpeed;
+		position += right * deltaTime * speed;
 	else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		position -= right * deltaTime * cameraSpeed;
+		position -= right * deltaTime * speed;
 
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		position += up * deltaTime * cameraSpeed;
-	else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		position -= up * deltaTime * cameraSpeed;
+		position += up * deltaTime * speed;
+	else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		position -= up * deltaTime * speed;
 
 	mainCam.SetPosition(position);
 }
@@ -209,23 +247,73 @@ void windowSizeChangeCallback(GLFWwindow* window, int newWidth, int newHeight)
 
 double lastX = -1;
 double lastY = -1;
-bool firstInput = true;
 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
-	if (firstInput)
+	if (!imGuiMenuOpen)
 	{
-		firstInput = false;
-		return;
+		glm::vec2 camRotation = mainCam.GetRotation();
+
+		camRotation.x += static_cast<float>(xpos - lastX) * mouseSensitivity;
+		camRotation.y = fmin(fmax(camRotation.y + static_cast<float>(ypos - lastY) * mouseSensitivity, -89.0f), 89.0f);
+
+		mainCam.SetRotation(camRotation);
 	}
-
-	glm::vec2 camRotation = mainCam.GetRotation();
-
-	camRotation.x += static_cast<float>(xpos - lastX) * mouseSensitivity;
-	camRotation.y = fmin(fmax(camRotation.y + static_cast<float>(ypos - lastY) * mouseSensitivity, -89.0f), 89.0f);
-
-	mainCam.SetRotation(camRotation);
 
 	lastX = xpos;
 	lastY = ypos;
+}
+
+void initImGui(GLFWwindow* window)
+{
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+	// Setup Platform/Renderer backends
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init();
+}
+
+void beginFrameImGui()
+{
+	if (!imGuiMenuOpen)
+		return;
+
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+	ImGui::Begin("Hello");
+
+	ImGui::VSliderFloat("##constantSlider", ImVec2(25, 160), &pointLight.constant, 0.0f, 1.0f);
+	ImGui::SameLine();
+	ImGui::VSliderFloat("##linearSlider", ImVec2(25, 160), &pointLight.linear, 0.0f, 1.0f);
+	ImGui::SameLine();
+	ImGui::VSliderFloat("##quadraticSlider", ImVec2(25, 160), &pointLight.quadratic, 0.0f, 0.01f);
+	ImGui::DragFloat3("Diffuse", &pointLight.diffuse[0]);
+	ImGui::DragFloat3("Specular", &pointLight.specular[0]);
+
+	if (ImGui::Button("Move light to camera"))
+		pointLight.position = mainCam.GetPosition();
+
+	ImGui::End();
+}
+
+void endFrameImGui()
+{
+	if (!imGuiMenuOpen)
+		return;
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void cleanupImGui()
+{
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 }
