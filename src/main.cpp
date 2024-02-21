@@ -314,7 +314,7 @@ void beginFrameImGui()
 		ImGui::Spacing();
 
 		ImGui::DragFloat3("Position##pointlight", &pointLight.position[0], 0.05f);
-		if (ImGui::Button("Move light to camera##pointlight"))
+		if (ImGui::Button("Move to camera##pointlight"))
 			pointLight.position = mainCam.GetPosition();
 
 		ImGui::TreePop();
