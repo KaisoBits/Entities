@@ -32,7 +32,7 @@ Texture Texture::LoadFromFile(const std::string& path)
 		size_t dataSize = width * height;
 		auto rgbImageData = new unsigned char[dataSize * 3];
 
-		for (int i = 0; i < dataSize; ++i)
+		for (size_t i = 0; i < dataSize; ++i)
 		{
 			rgbImageData[i * 3 + 0] = imageData[i]; // R
 			rgbImageData[i * 3 + 1] = imageData[i]; // G
