@@ -117,7 +117,7 @@ int main()
 					value += 2.0f * deltaTime;
 				});
 
-			entities.push_back(e);
+			entities.push_back(std::move(e));
 		}
 	}
 
