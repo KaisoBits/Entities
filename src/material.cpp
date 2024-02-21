@@ -57,6 +57,33 @@ void Material::ApplyPointLight(const PointLight& pointLight) const
 		glUniform1f(m_pointLightQuadraticLocation, pointLight.quadratic);
 }
 
+void Material::ApplySpotLight(const SpotLight& spotLight) const
+{
+	if (m_spotLightPositionLocation >= 0)
+		glUniform3fv(m_spotLightPositionLocation, 1, &spotLight.position[0]);
+
+	if (m_spotLightDirectionLocation >= 0)
+		glUniform3fv(m_spotLightDirectionLocation, 1, &spotLight.direction[0]);
+
+	if (m_spotLightDiffuseLocation >= 0)
+		glUniform3fv(m_spotLightDiffuseLocation, 1, &spotLight.diffuse[0]);
+
+	if (m_spotLightSpecularLocation >= 0)
+		glUniform3fv(m_spotLightSpecularLocation, 1, &spotLight.specular[0]);
+
+	if (m_spotLightConstantLocation >= 0)
+		glUniform1f(m_spotLightConstantLocation, spotLight.constant);
+
+	if (m_spotLightLinearLocation >= 0)
+		glUniform1f(m_spotLightLinearLocation, spotLight.linear);
+
+	if (m_spotLightQuadraticLocation >= 0)
+		glUniform1f(m_spotLightQuadraticLocation, spotLight.quadratic);
+
+	if (m_spotLightCutoffLocation >= 0)
+		glUniform1f(m_spotLightCutoffLocation, spotLight.cutOff);
+}
+
 void Material::InitializeStandardUniforms()
 {
 	m_shader.Use();
@@ -81,6 +108,15 @@ void Material::InitializeStandardUniforms()
 	m_pointLightConstantLocation = m_shader.GetPramLocation("pointLight.constant");
 	m_pointLightLinearLocation = m_shader.GetPramLocation("pointLight.linear");
 	m_pointLightQuadraticLocation = m_shader.GetPramLocation("pointLight.quadratic");
+
+	m_spotLightPositionLocation = m_shader.GetPramLocation("spotLight.position");
+	m_spotLightDirectionLocation = m_shader.GetPramLocation("spotLight.direction");
+	m_spotLightDiffuseLocation = m_shader.GetPramLocation("spotLight.diffuse");
+	m_spotLightSpecularLocation = m_shader.GetPramLocation("spotLight.specular");
+	m_spotLightConstantLocation = m_shader.GetPramLocation("spotLight.constant");
+	m_spotLightLinearLocation = m_shader.GetPramLocation("spotLight.linear");
+	m_spotLightQuadraticLocation = m_shader.GetPramLocation("spotLight.quadratic");
+	m_spotLightCutoffLocation = m_shader.GetPramLocation("spotLight.cutoff");
 }
 
 void Material::ApplyUniforms() const
@@ -119,11 +155,13 @@ void Material::ApplyTextures() const
 	}
 }
 
-void Material::Use(const Sun& sun, const PointLight& pointLight) const
+void Material::Use(const Sun& sun, const PointLight& pointLight, const SpotLight& spotLight) const
 {
 	m_shader.Use();
 	ApplyUniforms();
 	ApplyTextures();
+
 	ApplySun(sun);
 	ApplyPointLight(pointLight);
+	ApplySpotLight(spotLight);
 }

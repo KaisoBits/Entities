@@ -71,8 +71,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\vertexShader.glsl" />
-    <None Include="shaders/**">
+    <None Include="shaders\vertexShader.glsl">
       <Filter>Shaders</Filter>
     </None>
     <None Include="shaders/**">
@@ -141,8 +140,12 @@
     <ClInclude Include="..\imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
     </ClInclude>
+    <ClInclude Include="spotlight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="shaders/**" />
     <EmbeddedResource Include="shaders/**" />
     <EmbeddedResource Include="shaders/**" />
     <EmbeddedResource Include="shaders/**" />

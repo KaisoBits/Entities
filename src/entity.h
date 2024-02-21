@@ -8,6 +8,7 @@
 #include "model.h"
 #include "sun.h"
 #include "pointlight.h"
+#include "spotlight.h"
 #include "camera.h"
 
 class Entity
@@ -16,7 +17,7 @@ public:
 	explicit Entity(const Model* model, Material material) :
 		m_model(model), m_material(std::move(material)) {}
 
-	void Draw(const Camera& camera, const Sun& sun, const PointLight& pointLight) const;
+	void Draw(const Camera& camera, const Sun& sun, const PointLight& pointLight, const SpotLight& spotLight) const;
 
 	[[nodiscard]] Material GetMaterial() const { return m_material; }
 	void SetMaterial(Material newMaterial) { m_material = std::move(newMaterial); }

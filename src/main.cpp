@@ -18,6 +18,10 @@
 #include "texture.h"
 #include "entity.h"
 
+#include "sun.h"
+#include "pointlight.h"
+#include "spotlight.h"
+
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -60,6 +64,17 @@ PointLight pointLight = {
 	.constant = 1.0f,
 	.linear = 0.8f,
 	.quadratic = 0.01f,
+};
+
+SpotLight spotLight = {
+	.position = glm::vec3(0, 10, 0),
+	.direction = glm::vec3(0, -1, 0),
+	.diffuse = glm::vec3(40.0f),
+	.specular = glm::vec3(40.0f),
+	.constant = 1.0f,
+	.linear = 0.8f,
+	.quadratic = 0.01f,
+	.cutOff = glm::cos(glm::radians(15.0f))
 };
 
 int main()
@@ -175,7 +190,7 @@ int main()
 		for (auto& entity : entities)
 		{
 			entity.Update(static_cast<float>(deltaTime));
-			entity.Draw(mainCam, sun, pointLight);
+			entity.Draw(mainCam, sun, pointLight, spotLight);
 		}
 
 		endFrameImGui();
@@ -303,11 +318,15 @@ void beginFrameImGui()
 		ImGui::TreePop();
 		ImGui::Spacing();
 	}
+
 	if (ImGui::TreeNode("Pointlight controls"))
 	{
 		ImGui::SliderFloat("Constant##pointlight", &pointLight.constant, 0.0f, 10.0f);
 		ImGui::SliderFloat("Linear##pointlight", &pointLight.linear, 0.0f, 1.0f);
 		ImGui::SliderFloat("Quadratic##pointlight", &pointLight.quadratic, 0.0f, 0.1f, "%.5f");
+
+		ImGui::Spacing();
+
 		ImGui::DragFloat3("Diffuse##pointlight", &pointLight.diffuse[0], 0.05f);
 		ImGui::DragFloat3("Specular##pointlight", &pointLight.specular[0], 0.05f);
 
@@ -316,6 +335,35 @@ void beginFrameImGui()
 		ImGui::DragFloat3("Position##pointlight", &pointLight.position[0], 0.05f);
 		if (ImGui::Button("Move to camera##pointlight"))
 			pointLight.position = mainCam.GetPosition();
+
+		ImGui::TreePop();
+		ImGui::Spacing();
+	}
+
+	if (ImGui::TreeNode("Spotlight controls"))
+	{
+		ImGui::SliderFloat("Constant##spotlight", &spotLight.constant, 0.0f, 10.0f);
+		ImGui::SliderFloat("Linear##spotlight", &spotLight.linear, 0.0f, 1.0f);
+		ImGui::SliderFloat("Quadratic##spotlight", &spotLight.quadratic, 0.0f, 0.1f, "%.5f");
+
+		ImGui::Spacing();
+
+		ImGui::SliderFloat("Cutoff##spotlight", &spotLight.cutOff, 0.0f, 1.0f);
+
+		ImGui::Spacing();
+
+		ImGui::DragFloat3("Diffuse##spotlight", &spotLight.diffuse[0], 0.05f);
+		ImGui::DragFloat3("Specular##spotlight", &spotLight.specular[0], 0.05f);
+
+		ImGui::Spacing();
+
+		ImGui::DragFloat3("Position##spotlight", &spotLight.position[0], 0.05f);
+		ImGui::DragFloat3("Direction##spotlight", &spotLight.position[0], 0.05f);
+		if (ImGui::Button("Align with camera##spotlight"))
+		{
+			spotLight.position = mainCam.GetPosition();
+			spotLight.direction = mainCam.Forward();
+		}
 
 		ImGui::TreePop();
 		ImGui::Spacing();

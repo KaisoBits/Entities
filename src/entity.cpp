@@ -4,12 +4,12 @@
 
 #include "entity.h"
 
-void Entity::Draw(const Camera& camera, const Sun& sun, const PointLight& pointLight) const
+void Entity::Draw(const Camera& camera, const Sun& sun, const PointLight& pointLight, const SpotLight& spotLight) const
 {
 	if (!m_model)
 		return;
 
-	m_material.Use(sun, pointLight);
+	m_material.Use(sun, pointLight, spotLight);
 
 	ApplyPositionAndRotation();
 	camera.Apply(m_material.GetShaderId());

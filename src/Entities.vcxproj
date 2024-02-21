@@ -182,6 +182,7 @@
     <ClInclude Include="objparser.h" />
     <ClInclude Include="pointlight.h" />
     <ClInclude Include="shaderprogram.h" />
+    <ClInclude Include="spotlight.h" />
     <ClInclude Include="sun.h" />
     <ClInclude Include="texture.h" />
   </ItemGroup>

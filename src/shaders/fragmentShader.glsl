@@ -41,6 +41,22 @@ struct PointLight
 };
 uniform PointLight pointLight;
 
+struct SpotLight
+{
+	vec3 position;
+	vec3 direction;
+
+	vec3 diffuse;
+	vec3 specular;
+
+	float constant;
+	float linear;
+	float quadratic;
+
+	float cutoff;
+};
+uniform SpotLight spotLight;
+
 float getDiffuseLightStrength(vec3 lightDirection) {
 	float dotResult = dot(normalVector, -normalize(lightDirection));
 	return max(dotResult, 0);
@@ -75,14 +91,28 @@ void main()
 
 	// Point light
 	float distanceToPointLight = distance(fragmentPosition, pointLight.position);
-	float attenuation = getAttenuation(distanceToPointLight);
-	vec3 diffusePointLight = pointLight.diffuse * attenuation * 
+	float pointLightAttenuation = getAttenuation(distanceToPointLight);
+	vec3 diffusePointLight = pointLight.diffuse * pointLightAttenuation  * 
 		getDiffuseLightStrength(fragmentPosition - pointLight.position) * diffuseMaterialStrength;
-	vec3 specularPointLight = pointLight.specular * attenuation * 
+	vec3 specularPointLight = pointLight.specular * pointLightAttenuation  * 
 		getSpecularLightStrength(fragmentPosition - pointLight.position)  * specularMaterialStrength;
 
+	// Spot light
+	float distanceToSpotLight = distance(fragmentPosition, spotLight.position);
+	float spotLightAttenuation = getAttenuation(distanceToSpotLight);
+	vec3 diffuseSpotLight = spotLight.diffuse * spotLightAttenuation * 
+		getDiffuseLightStrength(fragmentPosition - spotLight.position) * diffuseMaterialStrength;
+	vec3 specularSpotLight = spotLight.specular * spotLightAttenuation * 
+		getSpecularLightStrength(fragmentPosition - spotLight.position)  * specularMaterialStrength;
+
+	vec3 toSpotLight = normalize(spotLight.position - fragmentPosition);
+	float angle = dot(toSpotLight, -normalize(spotLight.direction));
+	float spotLighAngleModifier = angle < spotLight.cutoff ? 0.0 : 1.0;
+
+	// Combine
 	vec3 sunLight = ambientLight + diffuseLight + specularLight;
 	vec3 pointLight = diffusePointLight + specularPointLight;
+	vec3 spotLight = (diffuseSpotLight + specularSpotLight) * spotLighAngleModifier;
 
-	FragColor = vec4(sunLight + pointLight, 1.0);
+	FragColor = vec4(sunLight + pointLight + spotLight, 1.0);
 }
