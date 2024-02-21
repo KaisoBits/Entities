@@ -45,6 +45,14 @@ bool imGuiMenuOpen = false;
 
 Camera mainCam(75, static_cast<float>(windowWidth) / windowHeight);
 
+
+Sun sun = {
+	.direction = glm::vec3(1.0, -1, 0),
+	.ambient = glm::vec3(0.02f),
+	.diffuse = glm::vec3(0.3f),
+	.specular = glm::vec3(0.5f)
+};
+
 PointLight pointLight = {
 	.position = glm::vec3(0),
 	.diffuse = glm::vec3(40.0f),
@@ -120,13 +128,6 @@ int main()
 			entities.push_back(std::move(e));
 		}
 	}
-
-	constexpr Sun sun = {
-		.direction = glm::vec3(1.0, -1, 0),
-		.ambient = glm::vec3(0.02f),
-		.diffuse = glm::vec3(0.3f),
-		.specular = glm::vec3(0.5f)
-	};
 
 	const Model groundModel = ObjParser::LoadFromFile("resources/models/ground.obj");
 	Material groundMaterial(sp);
@@ -286,18 +287,39 @@ void beginFrameImGui()
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
-	ImGui::Begin("Hello");
+	ImGui::Begin("Debug menu");
+	if (ImGui::TreeNode("Sun controls"))
+	{
+		ImGui::DragFloat3("Ambient##sun", &sun.ambient[0], 0.05f);
+		ImGui::DragFloat3("Diffuse##sun", &sun.diffuse[0], 0.05f);
+		ImGui::DragFloat3("Specular##sun", &sun.specular[0], 0.05f);
 
-	ImGui::VSliderFloat("##constantSlider", ImVec2(25, 160), &pointLight.constant, 0.0f, 1.0f);
-	ImGui::SameLine();
-	ImGui::VSliderFloat("##linearSlider", ImVec2(25, 160), &pointLight.linear, 0.0f, 1.0f);
-	ImGui::SameLine();
-	ImGui::VSliderFloat("##quadraticSlider", ImVec2(25, 160), &pointLight.quadratic, 0.0f, 0.01f);
-	ImGui::DragFloat3("Diffuse", &pointLight.diffuse[0]);
-	ImGui::DragFloat3("Specular", &pointLight.specular[0]);
+		ImGui::Spacing();
 
-	if (ImGui::Button("Move light to camera"))
-		pointLight.position = mainCam.GetPosition();
+		ImGui::DragFloat3("Direction##sun", &sun.direction[0], 0.05f);
+		if (ImGui::Button("Align with camera##sun"))
+			sun.direction = mainCam.Forward();
+
+		ImGui::TreePop();
+		ImGui::Spacing();
+	}
+	if (ImGui::TreeNode("Pointlight controls"))
+	{
+		ImGui::SliderFloat("Constant##pointlight", &pointLight.constant, 0.0f, 10.0f);
+		ImGui::SliderFloat("Linear##pointlight", &pointLight.linear, 0.0f, 1.0f);
+		ImGui::SliderFloat("Quadratic##pointlight", &pointLight.quadratic, 0.0f, 0.1f, "%.5f");
+		ImGui::DragFloat3("Diffuse##pointlight", &pointLight.diffuse[0], 0.05f);
+		ImGui::DragFloat3("Specular##pointlight", &pointLight.specular[0], 0.05f);
+
+		ImGui::Spacing();
+
+		ImGui::DragFloat3("Position##pointlight", &pointLight.position[0], 0.05f);
+		if (ImGui::Button("Move light to camera##pointlight"))
+			pointLight.position = mainCam.GetPosition();
+
+		ImGui::TreePop();
+		ImGui::Spacing();
+	}
 
 	ImGui::End();
 }
