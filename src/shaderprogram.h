@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 #include <glm/glm.hpp>
 
 class ShaderProgram
@@ -23,4 +24,5 @@ private:
 	explicit ShaderProgram(unsigned int programId) : m_programId(programId) {}
 
 	unsigned int m_programId = 0;
+	mutable std::unordered_map<std::string, int> m_shaderLocationCache;
 };

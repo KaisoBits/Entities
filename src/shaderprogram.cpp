@@ -54,7 +54,19 @@ ShaderProgram ShaderProgram::Compile(const std::string& vertexShaderSource, cons
 
 int ShaderProgram::GetPramLocation(const std::string& paramName) const
 {
-	return glGetUniformLocation(m_programId, paramName.c_str());
+	auto iter = m_shaderLocationCache.find(paramName);
+	int value = -1;
+	if (iter != m_shaderLocationCache.end())
+	{
+		value = iter->second;
+	}
+	else
+	{
+		value = glGetUniformLocation(m_programId, paramName.c_str());
+		m_shaderLocationCache[paramName] = value;
+	}
+
+	return value;
 }
 
 void ShaderProgram::Use() const
