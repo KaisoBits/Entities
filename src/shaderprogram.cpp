@@ -61,3 +61,47 @@ void ShaderProgram::Use() const
 {
 	glUseProgram(m_programId);
 }
+
+void ShaderProgram::SetInt(const std::string& paramName, int value) const
+{
+	int location = GetPramLocation(paramName);
+	if (location < 0)
+	{
+		std::cout << "Unknown param name \"" << paramName << "\"\n";
+		return;
+	}
+	glUniform1i(location, value);
+}
+
+void ShaderProgram::SetFloat(const std::string& paramName, float value) const
+{
+	int location = GetPramLocation(paramName);
+	if (location < 0)
+	{
+		std::cout << "Unknown param name \"" << paramName << "\"\n";
+		return;
+	}
+	glUniform1f(location, value);
+}
+
+void ShaderProgram::SetVector3(const std::string& paramName, glm::vec3 value) const
+{
+	int location = GetPramLocation(paramName);
+	if (location < 0)
+	{
+		std::cout << "Unknown param name \"" << paramName << "\"\n";
+		return;
+	}
+	glUniform3fv(location, 1, &value[0]);
+}
+
+void ShaderProgram::SetVector2(const std::string& paramName, glm::vec2 value) const
+{
+	int location = GetPramLocation(paramName);
+	if (location < 0)
+	{
+		std::cout << "Unknown param name \"" << paramName << "\"\n";
+		return;
+	}
+	glUniform2fv(location, 1, &value[0]);
+}

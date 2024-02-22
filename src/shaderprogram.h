@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <glm/glm.hpp>
 
 class ShaderProgram
 {
@@ -12,6 +13,11 @@ public:
 	void Use() const;
 
 	[[nodiscard]] unsigned int GetId() const { return m_programId; }
+
+	void SetInt(const std::string& paramName, int value) const;
+	void SetFloat(const std::string& paramName, float value) const;
+	void SetVector3(const std::string& paramName, glm::vec3 value) const;
+	void SetVector2(const std::string& paramName, glm::vec2 value) const;
 
 private:
 	explicit ShaderProgram(unsigned int programId) : m_programId(programId) {}
