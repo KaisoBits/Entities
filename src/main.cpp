@@ -27,6 +27,8 @@
 
 using namespace std::chrono_literals;
 
+constexpr int maxLights = 10;
+
 constexpr int windowWidth = 800;
 constexpr int windowHeight = 600;
 
@@ -46,7 +48,7 @@ void endFrameImGui();
 void cleanupImGui();
 bool imGuiMenuOpen = false;
 
-Camera mainCam(75, static_cast<float>(windowWidth) / windowHeight);
+Camera mainCam(75, static_cast<float>(16.0f) / 9.0f);
 
 std::vector<Entity> entities;
 
@@ -56,7 +58,7 @@ std::vector<Sun> suns = {
 		.ambient = glm::vec3(0.02f),
 		.diffuse = glm::vec3(0.3f),
 		.specular = glm::vec3(0.5f)
-	}
+	},
 };
 
 std::vector<PointLight> pointLights = {
@@ -320,78 +322,152 @@ void beginFrameImGui()
 	ImGui::NewFrame();
 
 	ImGui::Begin("Debug menu");
-	if (suns.size() > 0 && ImGui::TreeNode("Sun controls"))
+	if (ImGui::TreeNode("Sun controls"))
 	{
-		ImGui::SliderInt("Selected##sun", &selectedSun, 0, suns.size() - 1);
-		Sun& sun = suns[selectedSun];
-
-		ImGui::DragFloat3("Ambient##sun", &sun.ambient[0], 0.05f);
-		ImGui::DragFloat3("Diffuse##sun", &sun.diffuse[0], 0.05f);
-		ImGui::DragFloat3("Specular##sun", &sun.specular[0], 0.05f);
-
-		ImGui::Spacing();
-
-		ImGui::DragFloat3("Direction##sun", &sun.direction[0], 0.05f);
-		if (ImGui::Button("Align with camera##sun"))
-			sun.direction = mainCam.Forward();
-
-		ImGui::TreePop();
-		ImGui::Spacing();
-	}
-
-	if (pointLights.size() > 0 && ImGui::TreeNode("Pointlight controls"))
-	{
-		ImGui::SliderInt("Selected##pointlight", &selectedPointLight, 0, pointLights.size() - 1);
-		PointLight& pointLight = pointLights[selectedPointLight];
-
-		ImGui::SliderFloat("Constant##pointlight", &pointLight.constant, 0.0f, 10.0f);
-		ImGui::SliderFloat("Linear##pointlight", &pointLight.linear, 0.0f, 1.0f);
-		ImGui::SliderFloat("Quadratic##pointlight", &pointLight.quadratic, 0.0f, 0.1f, "%.5f");
-
-		ImGui::Spacing();
-
-		ImGui::DragFloat3("Diffuse##pointlight", &pointLight.diffuse[0], 0.05f);
-		ImGui::DragFloat3("Specular##pointlight", &pointLight.specular[0], 0.05f);
-
-		ImGui::Spacing();
-
-		ImGui::DragFloat3("Position##pointlight", &pointLight.position[0], 0.05f);
-		if (ImGui::Button("Move to camera##pointlight"))
-			pointLight.position = mainCam.GetPosition();
-
-		ImGui::TreePop();
-		ImGui::Spacing();
-	}
-
-	if (spotLights.size() > 0 && ImGui::TreeNode("Spotlight controls"))
-	{
-		ImGui::SliderInt("Selected##spotlight", &selectedSpotLight, 0, spotLights.size() - 1);
-		SpotLight& spotLight = spotLights[selectedSpotLight];
-
-		ImGui::SliderFloat("Constant##spotlight", &spotLight.constant, 0.0f, 10.0f);
-		ImGui::SliderFloat("Linear##spotlight", &spotLight.linear, 0.0f, 1.0f);
-		ImGui::SliderFloat("Quadratic##spotlight", &spotLight.quadratic, 0.0f, 0.1f, "%.5f");
-
-		ImGui::Spacing();
-
-		ImGui::SliderFloat("Inner cutoff##spotlight", &spotLight.innerCutoff, spotLight.outerCutoff, 1.0f);
-		ImGui::SliderFloat("Outer cutoff##spotlight", &spotLight.outerCutoff, 0.0f, spotLight.innerCutoff);
-
-		ImGui::Spacing();
-
-		ImGui::DragFloat3("Diffuse##spotlight", &spotLight.diffuse[0], 0.05f);
-		ImGui::DragFloat3("Specular##spotlight", &spotLight.specular[0], 0.05f);
-
-		ImGui::Spacing();
-
-		ImGui::DragFloat3("Position##spotlight", &spotLight.position[0], 0.05f);
-		ImGui::DragFloat3("Direction##spotlight", &spotLight.direction[0], 0.05f);
-		if (ImGui::Button("Align with camera##spotlight"))
+		if (suns.size() > 0)
 		{
-			spotLight.position = mainCam.GetPosition();
-			spotLight.direction = mainCam.Forward();
+			ImGui::SliderInt("Selected##sun", &selectedSun, 0, suns.size() - 1);
+			Sun& sun = suns[selectedSun];
+
+			ImGui::DragFloat3("Ambient##sun", &sun.ambient[0], 0.05f);
+			ImGui::DragFloat3("Diffuse##sun", &sun.diffuse[0], 0.05f);
+			ImGui::DragFloat3("Specular##sun", &sun.specular[0], 0.05f);
+
+			ImGui::Spacing();
+
+			ImGui::DragFloat3("Direction##sun", &sun.direction[0], 0.05f);
+			if (ImGui::Button("Align with camera##sun"))
+				sun.direction = mainCam.Forward();
+			ImGui::SameLine();
+		}
+		if (suns.size() < maxLights && ImGui::Button("Add##sun"))
+		{
+			suns.emplace_back(Sun
+				{
+					.direction = mainCam.Forward(),
+					.ambient = glm::vec3(0.02f),
+					.diffuse = glm::vec3(0.3f),
+					.specular = glm::vec3(0.5f)
+				});
+
+			selectedSun = suns.size() - 1;
+		}
+		ImGui::SameLine();
+		if (suns.size() > 0 && ImGui::Button("Delete##sun"))
+		{
+			suns.erase(suns.begin() + selectedSun);
+			if (selectedSun == suns.size())
+				selectedSun--;
 		}
 
+		ImGui::TreePop();
+		ImGui::Spacing();
+	}
+
+	if (ImGui::TreeNode("Pointlight controls"))
+	{
+		if (pointLights.size() > 0)
+		{
+			ImGui::SliderInt("Selected##pointlight", &selectedPointLight, 0, pointLights.size() - 1);
+			PointLight& pointLight = pointLights[selectedPointLight];
+
+			ImGui::SliderFloat("Constant##pointlight", &pointLight.constant, 0.0f, 10.0f);
+			ImGui::SliderFloat("Linear##pointlight", &pointLight.linear, 0.0f, 1.0f);
+			ImGui::SliderFloat("Quadratic##pointlight", &pointLight.quadratic, 0.0f, 0.1f, "%.5f");
+
+			ImGui::Spacing();
+
+			ImGui::DragFloat3("Diffuse##pointlight", &pointLight.diffuse[0], 0.05f);
+			ImGui::DragFloat3("Specular##pointlight", &pointLight.specular[0], 0.05f);
+
+			ImGui::Spacing();
+
+			ImGui::DragFloat3("Position##pointlight", &pointLight.position[0], 0.05f);
+			if (ImGui::Button("Move to camera##pointlight"))
+				pointLight.position = mainCam.GetPosition();
+			ImGui::SameLine();
+		}
+		if (pointLights.size() < maxLights && ImGui::Button("Add##pointlight"))
+		{
+			pointLights.emplace_back(PointLight
+				{
+					.position = mainCam.GetPosition(),
+					.diffuse = glm::vec3(40.0f),
+					.specular = glm::vec3(40.0f),
+					.constant = 1.0f,
+					.linear = 0.8f,
+					.quadratic = 0.01f,
+				});
+
+			selectedPointLight = pointLights.size() - 1;
+		}
+		ImGui::SameLine();
+		if (pointLights.size() > 0 && ImGui::Button("Delete##pointlight"))
+		{
+			pointLights.erase(pointLights.begin() + selectedPointLight);
+			if (selectedPointLight == pointLights.size())
+				selectedPointLight--;
+		}
+
+		ImGui::TreePop();
+		ImGui::Spacing();
+	}
+
+	if (ImGui::TreeNode("Spotlight controls"))
+	{
+		if (spotLights.size() > 0)
+		{
+			ImGui::SliderInt("Selected##spotlight", &selectedSpotLight, 0, spotLights.size() - 1);
+			SpotLight& spotLight = spotLights[selectedSpotLight];
+
+			ImGui::SliderFloat("Constant##spotlight", &spotLight.constant, 0.0f, 10.0f);
+			ImGui::SliderFloat("Linear##spotlight", &spotLight.linear, 0.0f, 1.0f);
+			ImGui::SliderFloat("Quadratic##spotlight", &spotLight.quadratic, 0.0f, 0.1f, "%.5f");
+
+			ImGui::Spacing();
+
+			ImGui::SliderFloat("Inner cutoff##spotlight", &spotLight.innerCutoff, spotLight.outerCutoff, 1.0f);
+			ImGui::SliderFloat("Outer cutoff##spotlight", &spotLight.outerCutoff, 0.0f, spotLight.innerCutoff);
+
+			ImGui::Spacing();
+
+			ImGui::DragFloat3("Diffuse##spotlight", &spotLight.diffuse[0], 0.05f);
+			ImGui::DragFloat3("Specular##spotlight", &spotLight.specular[0], 0.05f);
+
+			ImGui::Spacing();
+
+			ImGui::DragFloat3("Position##spotlight", &spotLight.position[0], 0.05f);
+			ImGui::DragFloat3("Direction##spotlight", &spotLight.direction[0], 0.05f);
+			if (ImGui::Button("Align with camera##spotlight"))
+			{
+				spotLight.position = mainCam.GetPosition();
+				spotLight.direction = mainCam.Forward();
+			}
+			ImGui::SameLine();
+		}
+		if (spotLights.size() < maxLights && ImGui::Button("Add##spotlight"))
+		{
+			spotLights.emplace_back(SpotLight
+				{
+					.position = mainCam.GetPosition(),
+					.direction = mainCam.Forward(),
+					.diffuse = glm::vec3(40.0f),
+					.specular = glm::vec3(40.0f),
+					.constant = 1.0f,
+					.linear = 0.8f,
+					.quadratic = 0.01f,
+					.innerCutoff = glm::cos(glm::radians(15.0f)),
+					.outerCutoff = glm::cos(glm::radians(25.0f))
+				});
+			selectedSpotLight = spotLights.size() - 1;
+		}
+		ImGui::SameLine();
+		if (spotLights.size() > 0 && ImGui::Button("Delete##spotlight"))
+		{
+			spotLights.erase(spotLights.begin() + selectedSpotLight);
+			if (selectedSpotLight == spotLights.size())
+				selectedSpotLight--;
+		}
 		ImGui::TreePop();
 		ImGui::Spacing();
 	}
