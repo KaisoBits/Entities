@@ -324,7 +324,7 @@ void beginFrameImGui()
 	ImGui::Begin("Debug menu");
 	if (suns.size() > 0 && ImGui::TreeNode("Sun controls"))
 	{
-		ImGui::SliderInt("Light##sun", &selectedSun, 0, suns.size() - 1);
+		ImGui::SliderInt("Selected##sun", &selectedSun, 0, suns.size() - 1);
 		Sun& sun = suns[selectedSun];
 
 		ImGui::DragFloat3("Ambient##sun", &sun.ambient[0], 0.05f);
@@ -343,7 +343,7 @@ void beginFrameImGui()
 
 	if (pointLights.size() > 0 && ImGui::TreeNode("Pointlight controls"))
 	{
-		ImGui::SliderInt("Light##pointlight", &selectedPointLight, 0, pointLights.size() - 1);
+		ImGui::SliderInt("Selected##pointlight", &selectedPointLight, 0, pointLights.size() - 1);
 		PointLight& pointLight = pointLights[selectedPointLight];
 
 		ImGui::SliderFloat("Constant##pointlight", &pointLight.constant, 0.0f, 10.0f);
@@ -367,7 +367,7 @@ void beginFrameImGui()
 
 	if (spotLights.size() > 0 && ImGui::TreeNode("Spotlight controls"))
 	{
-		ImGui::SliderInt("Spotlight##spotlight", &selectedSpotLight, 0, spotLights.size() - 1);
+		ImGui::SliderInt("Selected##spotlight", &selectedSpotLight, 0, spotLights.size() - 1);
 		SpotLight& spotLight = spotLights[selectedSpotLight];
 
 		ImGui::SliderFloat("Constant##spotlight", &spotLight.constant, 0.0f, 10.0f);
