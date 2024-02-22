@@ -80,7 +80,8 @@ private:
 	int m_spotLightConstantLocation = -1;
 	int m_spotLightLinearLocation = -1;
 	int m_spotLightQuadraticLocation = -1;
-	int m_spotLightCutoffLocation = -1;
+	int m_spotLightInnerCutoffLocation = -1;
+	int m_spotLightOuterCutoffLocation = -1;
 
 	ShaderProgram m_shader;
 };

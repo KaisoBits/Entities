@@ -74,7 +74,8 @@ SpotLight spotLight = {
 	.constant = 1.0f,
 	.linear = 0.8f,
 	.quadratic = 0.01f,
-	.cutOff = glm::cos(glm::radians(15.0f))
+	.innerCutoff = glm::cos(glm::radians(15.0f)),
+	.outerCutoff = glm::cos(glm::radians(25.0f))
 };
 
 int main()
@@ -348,7 +349,8 @@ void beginFrameImGui()
 
 		ImGui::Spacing();
 
-		ImGui::SliderFloat("Cutoff##spotlight", &spotLight.cutOff, 0.0f, 1.0f);
+		ImGui::SliderFloat("Inner cutoff##spotlight", &spotLight.innerCutoff, 0.0f, 1.0f);
+		ImGui::SliderFloat("Outer cutoff##spotlight", &spotLight.outerCutoff, 0.0f, 1.0f);
 
 		ImGui::Spacing();
 

@@ -80,8 +80,11 @@ void Material::ApplySpotLight(const SpotLight& spotLight) const
 	if (m_spotLightQuadraticLocation >= 0)
 		glUniform1f(m_spotLightQuadraticLocation, spotLight.quadratic);
 
-	if (m_spotLightCutoffLocation >= 0)
-		glUniform1f(m_spotLightCutoffLocation, spotLight.cutOff);
+	if (m_spotLightInnerCutoffLocation >= 0)
+		glUniform1f(m_spotLightInnerCutoffLocation, spotLight.innerCutoff);
+
+	if (m_spotLightOuterCutoffLocation >= 0)
+		glUniform1f(m_spotLightOuterCutoffLocation, spotLight.outerCutoff);
 }
 
 void Material::InitializeStandardUniforms()
@@ -116,7 +119,8 @@ void Material::InitializeStandardUniforms()
 	m_spotLightConstantLocation = m_shader.GetPramLocation("spotLight.constant");
 	m_spotLightLinearLocation = m_shader.GetPramLocation("spotLight.linear");
 	m_spotLightQuadraticLocation = m_shader.GetPramLocation("spotLight.quadratic");
-	m_spotLightCutoffLocation = m_shader.GetPramLocation("spotLight.cutoff");
+	m_spotLightInnerCutoffLocation = m_shader.GetPramLocation("spotLight.innerCutoff");
+	m_spotLightOuterCutoffLocation = m_shader.GetPramLocation("spotLight.outerCutoff");
 }
 
 void Material::ApplyUniforms() const

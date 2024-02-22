@@ -53,7 +53,8 @@ struct SpotLight
 	float linear;
 	float quadratic;
 
-	float cutoff;
+	float innerCutoff;
+	float outerCutoff;
 };
 uniform SpotLight spotLight;
 
@@ -105,7 +106,7 @@ void main()
 
 	vec3 toSpotLight = normalize(spotLight.position - fragmentPosition);
 	float angle = dot(toSpotLight, -normalize(spotLight.direction));
-	float spotLighAngleModifier = angle < spotLight.cutoff ? 0.0 : 1.0;
+	float spotLighAngleModifier = clamp((angle - spotLight.outerCutoff) / (spotLight.innerCutoff - spotLight.outerCutoff), 0, 1);
 
 	// Combine
 	vec3 sunLight = ambientLight + diffuseLight + specularLight;

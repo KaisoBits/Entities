@@ -14,5 +14,6 @@ struct SpotLight
 	float linear;
 	float quadratic;
 
-	float cutOff;
+	float innerCutoff;
+	float outerCutoff;
 };
