@@ -48,7 +48,7 @@ void endFrameImGui();
 void cleanupImGui();
 bool imGuiMenuOpen = false;
 
-Camera mainCam(75, static_cast<float>(16.0f) / 9.0f);
+Camera mainCam(75, static_cast<float>(windowWidth) / windowHeight);
 
 std::vector<Entity> entities;
 
