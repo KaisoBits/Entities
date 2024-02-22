@@ -49,6 +49,7 @@ bool imGuiMenuOpen = false;
 
 Camera mainCam(75, static_cast<float>(windowWidth) / windowHeight);
 
+std::vector<Entity> entities;
 
 std::vector<Sun> suns = {
 	{
@@ -134,11 +135,9 @@ int main()
 	material1.SetDiffuseMap(&textureColor);
 	material1.SetSpecularMap(&textureSpecular);
 
-	std::vector<Entity> entities;
-
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		for (int j = 0; j < 5; j++)
+		for (int j = 0; j < 10; j++)
 		{
 			float value = static_cast<float>(i + j) / 2.0f;
 
