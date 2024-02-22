@@ -136,9 +136,9 @@ int main()
 
 	std::vector<Entity> entities;
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 5; i++)
 	{
-		for (int j = 0; j < 10; j++)
+		for (int j = 0; j < 5; j++)
 		{
 			float value = static_cast<float>(i + j) / 2.0f;
 
@@ -376,8 +376,8 @@ void beginFrameImGui()
 
 		ImGui::Spacing();
 
-		ImGui::SliderFloat("Inner cutoff##spotlight", &spotLight.innerCutoff, 0.0f, 1.0f);
-		ImGui::SliderFloat("Outer cutoff##spotlight", &spotLight.outerCutoff, 0.0f, 1.0f);
+		ImGui::SliderFloat("Inner cutoff##spotlight", &spotLight.innerCutoff, spotLight.outerCutoff, 1.0f);
+		ImGui::SliderFloat("Outer cutoff##spotlight", &spotLight.outerCutoff, 0.0f, spotLight.innerCutoff);
 
 		ImGui::Spacing();
 
