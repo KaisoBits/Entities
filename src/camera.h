@@ -63,30 +63,14 @@ public:
 		return glm::cross(ForwardJustYaw(), Up());
 	}
 
-	void Apply(unsigned int shaderId) const
+	void Apply(ShaderProgram& shader) const
 	{
-		int viewMatrixLocation = glGetUniformLocation(shaderId, "view");
-		if (viewMatrixLocation >= 0)
-		{
-			glm::mat4 viewMatrix = GetMatrix();
+		shader.SetMat4("view", GetMatrix());
 
-			glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-		}
-
-		int perspectiveMatrixLocation = glGetUniformLocation(shaderId, "perspective");
-		if (perspectiveMatrixLocation >= 0)
-		{
-			glm::mat4 perspective =
-				glm::perspective(glm::radians(m_fovY), m_aspectRatio, 0.1f, 1000.0f);
-
-			glUniformMatrix4fv(perspectiveMatrixLocation, 1, GL_FALSE, glm::value_ptr(perspective));
-		}
-
-		int positionLocation = glGetUniformLocation(shaderId, "cameraPosition");
-		if (positionLocation >= 0)
-		{
-			glUniform3fv(positionLocation, 1, &m_position[0]);
-		}
+		glm::mat4 perspective =
+			glm::perspective(glm::radians(m_fovY), m_aspectRatio, 0.1f, 1000.0f);
+		shader.SetMat4("perspective", perspective);
+		shader.SetVector3("cameraPosition", m_position);
 	}
 
 private:

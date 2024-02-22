@@ -1,6 +1,9 @@
 #include "shaderprogram.h"
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+
+unsigned int ShaderProgram::m_currentlyUsedShader = 0;
 
 ShaderProgram ShaderProgram::Compile(const std::string& vertexShaderSource, const std::string& fragmentShaderSource)
 {
@@ -71,10 +74,15 @@ int ShaderProgram::GetPramLocation(const std::string& paramName) const
 
 void ShaderProgram::Use() const
 {
-	glUseProgram(m_programId);
+	unsigned int id = GetId();
+	if (m_currentlyUsedShader != id)
+	{ 
+		m_currentlyUsedShader = id;
+		glUseProgram(m_programId);
+	}
 }
 
-void ShaderProgram::SetInt(const std::string& paramName, int value) const
+void ShaderProgram::SetInt(const std::string& paramName, int value)
 {
 	int location = GetPramLocation(paramName);
 	if (location < 0)
@@ -90,7 +98,7 @@ void ShaderProgram::SetInt(const std::string& paramName, int value) const
 	}
 }
 
-void ShaderProgram::SetFloat(const std::string& paramName, float value) const
+void ShaderProgram::SetFloat(const std::string& paramName, float value)
 {
 	int location = GetPramLocation(paramName);
 	if (location < 0)
@@ -106,7 +114,7 @@ void ShaderProgram::SetFloat(const std::string& paramName, float value) const
 	}
 }
 
-void ShaderProgram::SetVector3(const std::string& paramName, const glm::vec3& value) const
+void ShaderProgram::SetVector3(const std::string& paramName, const glm::vec3& value)
 {
 	int location = GetPramLocation(paramName);
 	if (location < 0)
@@ -119,10 +127,10 @@ void ShaderProgram::SetVector3(const std::string& paramName, const glm::vec3& va
 	if (cachedIt == m_shaderValueCache.end() || std::get<glm::vec3>(cachedIt->second) != value) {
 		m_shaderValueCache[paramName] = value;
 		glUniform3fv(location, 1, &value[0]);
-	}	
+	}
 }
 
-void ShaderProgram::SetVector2(const std::string& paramName, const glm::vec2& value) const
+void ShaderProgram::SetVector2(const std::string& paramName, const glm::vec2& value)
 {
 	int location = GetPramLocation(paramName);
 	if (location < 0)
@@ -135,5 +143,21 @@ void ShaderProgram::SetVector2(const std::string& paramName, const glm::vec2& va
 	if (cachedIt == m_shaderValueCache.end() || std::get<glm::vec2>(cachedIt->second) != value) {
 		m_shaderValueCache[paramName] = value;
 		glUniform2fv(location, 1, &value[0]);
+	}
+}
+
+void ShaderProgram::SetMat4(const std::string& paramName, const glm::mat4& value)
+{
+	int location = GetPramLocation(paramName);
+	if (location < 0)
+	{
+		std::cout << "Unknown param name \"" << paramName << "\"\n";
+		return;
+	}
+
+	auto cachedIt = m_shaderValueCache.find(paramName);
+	if (cachedIt == m_shaderValueCache.end() || std::get<glm::mat4>(cachedIt->second) != value) {
+		m_shaderValueCache[paramName] = value;
+		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 	}
 }

@@ -1,6 +1,5 @@
 #include <string>
 #include <vector>
-#include <thread>
 #include <chrono>
 
 #include <glad/glad.h>
@@ -127,9 +126,9 @@ int main()
 	std::string vertexShader = readFileAsString("shaders/vertexShader.glsl");
 	std::string fragmentShader = readFileAsString("shaders/fragmentShader.glsl");
 
-	const ShaderProgram sp = ShaderProgram::Compile(vertexShader, fragmentShader);
+	ShaderProgram sp = ShaderProgram::Compile(vertexShader, fragmentShader);
 	const Model model = ObjParser::LoadFromFile("resources/models/cube.obj");
-	Material material1(sp);
+	Material material1(&sp);
 	const Texture textureColor = Texture::LoadFromFile("resources/textures/container_color.png");
 	const Texture textureSpecular = Texture::LoadFromFile("resources/textures/container_specular.png");
 	material1.SetDiffuseMap(&textureColor);
@@ -162,7 +161,7 @@ int main()
 	}
 
 	const Model groundModel = ObjParser::LoadFromFile("resources/models/ground.obj");
-	Material groundMaterial(sp);
+	Material groundMaterial(&sp);
 	groundMaterial.SetShininess(16);
 	const Texture groundTexture = Texture::LoadFromFile("resources/textures/ground_color.jpg");
 	const Texture groundSpecTexture = Texture::LoadFromFile("resources/textures/ground_spec.jpg");

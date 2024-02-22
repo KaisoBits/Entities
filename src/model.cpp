@@ -2,6 +2,8 @@
 
 #include "model.h"
 
+unsigned int Model::m_currentlyBoundBuffer = 0;
+
 Model Model::Create(const std::vector<float>& vertices, const std::vector<float>& uvs, const std::vector<float>& normals)
 {
 	unsigned int vertexArrayObject;
@@ -34,6 +36,10 @@ Model Model::Create(const std::vector<float>& vertices, const std::vector<float>
 
 void Model::Draw() const
 {
-	glBindVertexArray(m_buffer);
+	if (m_currentlyBoundBuffer != m_buffer)
+	{
+		m_currentlyBoundBuffer = m_buffer;
+		glBindVertexArray(m_buffer);
+	}
 	glDrawArrays(GL_TRIANGLES, 0, m_verticesCount);
 }
