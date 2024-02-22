@@ -5,22 +5,6 @@
 
 #include "material.h"
 
-void Material::SetFloat(const std::string& paramName, float value)
-{
-	int location = m_shader.GetPramLocation(paramName);
-
-	if (location >= 0)
-		m_floatUniforms[location] = value;
-}
-
-void Material::SetVec4(const std::string& paramName, glm::vec4 value)
-{
-	int location = m_shader.GetPramLocation(paramName);
-
-	if (location >= 0)
-		m_vec4Uniforms[location] = value;
-}
-
 void Material::ApplySuns(const std::vector<Sun>& suns) const
 {
 	m_shader.SetInt("sunsCount", suns.size());
@@ -70,39 +54,14 @@ void Material::ApplySpotLights(const std::vector<SpotLight>& spotLights) const
 	}
 }
 
-void Material::InitializeStandardUniforms()
-{
-	m_shader.Use();
-
-	m_colorLocation = m_shader.GetPramLocation("material.color");
-	m_diffuseMapLocation = m_shader.GetPramLocation("material.diffuseMap");
-	if (m_diffuseMapLocation >= 0) glUniform1i(m_diffuseMapLocation, 0);
-	m_diffuseOverrideLocation = m_shader.GetPramLocation("material.diffuseOverride");
-	m_specularMapLocation = m_shader.GetPramLocation("material.specularMap");
-	if (m_specularMapLocation >= 0) glUniform1i(m_specularMapLocation, 1);
-	m_specularOverrideLocation = m_shader.GetPramLocation("material.specularOverride");
-	m_shininessLocation = m_shader.GetPramLocation("material.shininess");
-}
-
 void Material::ApplyUniforms() const
 {
-	if (m_colorLocation >= 0)
-		glUniform3fv(m_colorLocation, 1, &m_color[0]);
-
-	if (m_diffuseOverrideLocation >= 0)
-		glUniform1i(m_diffuseOverrideLocation, m_diffuseMap == nullptr);
-
-	if (m_specularOverrideLocation >= 0)
-		glUniform1i(m_specularOverrideLocation, m_specularMap == nullptr);
-
-	if (m_shininessLocation >= 0)
-		glUniform1f(m_shininessLocation, m_shininess);
-
-	for (const auto& [location, value] : m_floatUniforms)
-		glUniform1f(location, value);
-
-	for (const auto& [location, value] : m_vec4Uniforms)
-		glUniform4f(location, value.x, value.y, value.z, value.w);
+	m_shader.SetVector3("material.color", m_color);
+	m_shader.SetInt("material.diffuseMap", 0);
+	m_shader.SetInt("material.diffuseOverride", m_diffuseMap == nullptr);
+	m_shader.SetInt("material.specularMap", 1);
+	m_shader.SetInt("material.specularOverride", m_specularMap == nullptr);
+	m_shader.SetFloat("material.shininess", m_shininess);
 }
 
 void Material::ApplyTextures() const

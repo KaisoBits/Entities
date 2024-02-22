@@ -106,7 +106,7 @@ void ShaderProgram::SetFloat(const std::string& paramName, float value) const
 	}
 }
 
-void ShaderProgram::SetVector3(const std::string& paramName, glm::vec3 value) const
+void ShaderProgram::SetVector3(const std::string& paramName, const glm::vec3& value) const
 {
 	int location = GetPramLocation(paramName);
 	if (location < 0)
@@ -122,7 +122,7 @@ void ShaderProgram::SetVector3(const std::string& paramName, glm::vec3 value) co
 	}	
 }
 
-void ShaderProgram::SetVector2(const std::string& paramName, glm::vec2 value) const
+void ShaderProgram::SetVector2(const std::string& paramName, const glm::vec2& value) const
 {
 	int location = GetPramLocation(paramName);
 	if (location < 0)

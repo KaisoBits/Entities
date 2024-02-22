@@ -20,14 +20,15 @@ public:
 
 	void SetInt(const std::string& paramName, int value) const;
 	void SetFloat(const std::string& paramName, float value) const;
-	void SetVector3(const std::string& paramName, glm::vec3 value) const;
-	void SetVector2(const std::string& paramName, glm::vec2 value) const;
+	void SetVector3(const std::string& paramName, const glm::vec3& value) const;
+	void SetVector2(const std::string& paramName, const glm::vec2& value) const;
 
 private:
 	explicit ShaderProgram(unsigned int programId) : m_programId(programId) {}
 
 	unsigned int m_programId = 0;
+
 	mutable std::unordered_map<std::string, int> m_shaderLocationCache;
-	mutable std::unordered_map<std::string, 
-		std::variant<glm::vec3, glm::vec2, int, float>> m_shaderValueCache;
+	using ShaderValue = std::variant<glm::vec3, glm::vec2, int, float>;
+	mutable std::unordered_map<std::string, ShaderValue> m_shaderValueCache;
 };

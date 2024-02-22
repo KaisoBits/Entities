@@ -15,10 +15,7 @@ class Material
 {
 public:
 	Material() = delete;
-	Material(ShaderProgram shader) : m_shader(shader) { InitializeStandardUniforms(); }
-
-	void SetFloat(const std::string& paramName, float value);
-	void SetVec4(const std::string& paramName, glm::vec4 value);
+	Material(ShaderProgram shader) : m_shader(shader) { }
 
 	void Use(
 		const std::vector<Sun>& sun,
@@ -40,15 +37,11 @@ public:
 	[[nodiscard]] float GetShininess() const { return m_shininess; }
 
 private:
-	void InitializeStandardUniforms();
 	void ApplyUniforms() const;
 	void ApplyTextures() const;
 	void ApplySuns(const std::vector<Sun>& suns) const;
 	void ApplyPointLights(const std::vector<PointLight>& pointLight) const;
 	void ApplySpotLights(const std::vector<SpotLight>& spotLight) const;
-
-	std::map<int, float> m_floatUniforms;
-	std::map<int, glm::vec4> m_vec4Uniforms;
 
 	glm::vec3 m_color{ 1.f, 1.f, 1.f };
 	int m_colorLocation = -1;
