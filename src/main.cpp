@@ -58,7 +58,7 @@ Sun sun = {
 };
 
 PointLight pointLight = {
-	.position = glm::vec3(0),
+	.position = glm::vec3(0, -9.5f, 0),
 	.diffuse = glm::vec3(40.0f),
 	.specular = glm::vec3(40.0f),
 	.constant = 1.0f,
@@ -358,7 +358,7 @@ void beginFrameImGui()
 		ImGui::Spacing();
 
 		ImGui::DragFloat3("Position##spotlight", &spotLight.position[0], 0.05f);
-		ImGui::DragFloat3("Direction##spotlight", &spotLight.position[0], 0.05f);
+		ImGui::DragFloat3("Direction##spotlight", &spotLight.direction[0], 0.05f);
 		if (ImGui::Button("Align with camera##spotlight"))
 		{
 			spotLight.position = mainCam.GetPosition();
