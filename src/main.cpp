@@ -67,8 +67,8 @@ PointLight pointLight = {
 };
 
 SpotLight spotLight = {
-	.position = glm::vec3(0, 10, 0),
-	.direction = glm::vec3(0, -1, 0),
+	.position = glm::vec3(60, 25, 40),
+	.direction = glm::vec3(1, -1, 0),
 	.diffuse = glm::vec3(40.0f),
 	.specular = glm::vec3(40.0f),
 	.constant = 1.0f,

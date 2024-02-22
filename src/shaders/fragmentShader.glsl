@@ -69,11 +69,9 @@ float getSpecularLightStrength(vec3 lightDirection) {
 	return specLight;
 }
 
-float getAttenuation(float dist)
+float getAttenuation(float dist, float constant, float linear, float quadratic)
 {
-	return 1.0 / (pointLight.constant + 
-	pointLight.linear * dist + 
-	pointLight.quadratic * dist * dist);
+	return 1.0 / (constant + linear * dist + quadratic * dist * dist);
 }
 
 void main()
@@ -91,7 +89,7 @@ void main()
 
 	// Point light
 	float distanceToPointLight = distance(fragmentPosition, pointLight.position);
-	float pointLightAttenuation = getAttenuation(distanceToPointLight);
+	float pointLightAttenuation = getAttenuation(distanceToPointLight, pointLight.constant, pointLight.linear, pointLight.quadratic);
 	vec3 diffusePointLight = pointLight.diffuse * pointLightAttenuation  * 
 		getDiffuseLightStrength(fragmentPosition - pointLight.position) * diffuseMaterialStrength;
 	vec3 specularPointLight = pointLight.specular * pointLightAttenuation  * 
@@ -99,7 +97,7 @@ void main()
 
 	// Spot light
 	float distanceToSpotLight = distance(fragmentPosition, spotLight.position);
-	float spotLightAttenuation = getAttenuation(distanceToSpotLight);
+	float spotLightAttenuation = getAttenuation(distanceToSpotLight, spotLight.constant, spotLight.linear, spotLight.quadratic);
 	vec3 diffuseSpotLight = spotLight.diffuse * spotLightAttenuation * 
 		getDiffuseLightStrength(fragmentPosition - spotLight.position) * diffuseMaterialStrength;
 	vec3 specularSpotLight = spotLight.specular * spotLightAttenuation * 
