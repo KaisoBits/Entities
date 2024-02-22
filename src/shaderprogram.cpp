@@ -82,7 +82,12 @@ void ShaderProgram::SetInt(const std::string& paramName, int value) const
 		std::cout << "Unknown param name \"" << paramName << "\"\n";
 		return;
 	}
-	glUniform1i(location, value);
+
+	auto cachedIt = m_shaderValueCache.find(paramName);
+	if (cachedIt == m_shaderValueCache.end() || std::get<int>(cachedIt->second) != value) {
+		m_shaderValueCache[paramName] = value;
+		glUniform1i(location, value);
+	}
 }
 
 void ShaderProgram::SetFloat(const std::string& paramName, float value) const
@@ -93,7 +98,12 @@ void ShaderProgram::SetFloat(const std::string& paramName, float value) const
 		std::cout << "Unknown param name \"" << paramName << "\"\n";
 		return;
 	}
-	glUniform1f(location, value);
+
+	auto cachedIt = m_shaderValueCache.find(paramName);
+	if (cachedIt == m_shaderValueCache.end() || std::get<float>(cachedIt->second) != value) {
+		m_shaderValueCache[paramName] = value;
+		glUniform1f(location, value);
+	}
 }
 
 void ShaderProgram::SetVector3(const std::string& paramName, glm::vec3 value) const
@@ -104,7 +114,12 @@ void ShaderProgram::SetVector3(const std::string& paramName, glm::vec3 value) co
 		std::cout << "Unknown param name \"" << paramName << "\"\n";
 		return;
 	}
-	glUniform3fv(location, 1, &value[0]);
+
+	auto cachedIt = m_shaderValueCache.find(paramName);
+	if (cachedIt == m_shaderValueCache.end() || std::get<glm::vec3>(cachedIt->second) != value) {
+		m_shaderValueCache[paramName] = value;
+		glUniform3fv(location, 1, &value[0]);
+	}	
 }
 
 void ShaderProgram::SetVector2(const std::string& paramName, glm::vec2 value) const
@@ -115,5 +130,10 @@ void ShaderProgram::SetVector2(const std::string& paramName, glm::vec2 value) co
 		std::cout << "Unknown param name \"" << paramName << "\"\n";
 		return;
 	}
-	glUniform2fv(location, 1, &value[0]);
+
+	auto cachedIt = m_shaderValueCache.find(paramName);
+	if (cachedIt == m_shaderValueCache.end() || std::get<glm::vec2>(cachedIt->second) != value) {
+		m_shaderValueCache[paramName] = value;
+		glUniform2fv(location, 1, &value[0]);
+	}
 }

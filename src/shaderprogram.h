@@ -2,12 +2,15 @@
 
 #include <string>
 #include <unordered_map>
+#include <variant>
+
 #include <glm/glm.hpp>
 
 class ShaderProgram
 {
 public:
-	static ShaderProgram Compile(const std::string& vertexShaderSource, const std::string& fragmentShaderSource);
+	static ShaderProgram Compile(
+		const std::string& vertexShaderSource, const std::string& fragmentShaderSource);
 	static ShaderProgram Empty() { return ShaderProgram(0); }
 
 	[[nodiscard]] int GetPramLocation(const std::string& paramName) const;
@@ -25,4 +28,6 @@ private:
 
 	unsigned int m_programId = 0;
 	mutable std::unordered_map<std::string, int> m_shaderLocationCache;
+	mutable std::unordered_map<std::string, 
+		std::variant<glm::vec3, glm::vec2, int, float>> m_shaderValueCache;
 };
