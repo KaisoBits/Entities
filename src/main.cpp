@@ -50,32 +50,49 @@ bool imGuiMenuOpen = false;
 Camera mainCam(75, static_cast<float>(windowWidth) / windowHeight);
 
 
-Sun sun = {
-	.direction = glm::vec3(1.0, -1, 0),
-	.ambient = glm::vec3(0.02f),
-	.diffuse = glm::vec3(0.3f),
-	.specular = glm::vec3(0.5f)
+std::vector<Sun> suns = {
+	{
+		.direction = glm::vec3(1.0, -1, 0),
+		.ambient = glm::vec3(0.02f),
+		.diffuse = glm::vec3(0.3f),
+		.specular = glm::vec3(0.5f)
+	}
 };
 
-PointLight pointLight = {
-	.position = glm::vec3(0, -9.5f, 0),
-	.diffuse = glm::vec3(40.0f),
-	.specular = glm::vec3(40.0f),
-	.constant = 1.0f,
-	.linear = 0.8f,
-	.quadratic = 0.01f,
+std::vector<PointLight> pointLights = {
+	{
+		.position = glm::vec3(0, -9.5f, 0),
+		.diffuse = glm::vec3(40.0f),
+		.specular = glm::vec3(40.0f),
+		.constant = 1.0f,
+		.linear = 0.8f,
+		.quadratic = 0.01f,
+	}
 };
 
-SpotLight spotLight = {
-	.position = glm::vec3(60, 25, 40),
-	.direction = glm::vec3(1, -1, 0),
-	.diffuse = glm::vec3(40.0f),
-	.specular = glm::vec3(40.0f),
-	.constant = 1.0f,
-	.linear = 0.8f,
-	.quadratic = 0.01f,
-	.innerCutoff = glm::cos(glm::radians(15.0f)),
-	.outerCutoff = glm::cos(glm::radians(25.0f))
+std::vector<SpotLight> spotLights = {
+	{
+		.position = glm::vec3(60, 25, 40),
+		.direction = glm::vec3(1, -1, 0),
+		.diffuse = glm::vec3(40.0f),
+		.specular = glm::vec3(40.0f),
+		.constant = 1.0f,
+		.linear = 0.8f,
+		.quadratic = 0.01f,
+		.innerCutoff = glm::cos(glm::radians(15.0f)),
+		.outerCutoff = glm::cos(glm::radians(25.0f))
+	},
+	{
+		.position = glm::vec3(30, 25, 70),
+		.direction = glm::vec3(1, -1, 0),
+		.diffuse = glm::vec3(40.0f),
+		.specular = glm::vec3(40.0f),
+		.constant = 1.0f,
+		.linear = 0.8f,
+		.quadratic = 0.01f,
+		.innerCutoff = glm::cos(glm::radians(15.0f)),
+		.outerCutoff = glm::cos(glm::radians(25.0f))
+	}
 };
 
 int main()
@@ -191,14 +208,12 @@ int main()
 		for (auto& entity : entities)
 		{
 			entity.Update(static_cast<float>(deltaTime));
-			entity.Draw(mainCam, sun, pointLight, spotLight);
+			entity.Draw(mainCam, suns, pointLights, spotLights);
 		}
 
 		endFrameImGui();
 
 		glfwSwapBuffers(window);
-
-		std::this_thread::yield();
 	}
 
 	cleanupImGui();
@@ -294,6 +309,9 @@ void initImGui(GLFWwindow* window)
 	ImGui_ImplOpenGL3_Init();
 }
 
+int selectedSun = 0;
+int selectedPointLight = 0;
+int selectedSpotLight = 0;
 void beginFrameImGui()
 {
 	if (!imGuiMenuOpen)
@@ -304,8 +322,11 @@ void beginFrameImGui()
 	ImGui::NewFrame();
 
 	ImGui::Begin("Debug menu");
-	if (ImGui::TreeNode("Sun controls"))
+	if (suns.size() > 0 && ImGui::TreeNode("Sun controls"))
 	{
+		ImGui::SliderInt("Light##sun", &selectedSun, 0, suns.size() - 1);
+		Sun& sun = suns[selectedSun];
+
 		ImGui::DragFloat3("Ambient##sun", &sun.ambient[0], 0.05f);
 		ImGui::DragFloat3("Diffuse##sun", &sun.diffuse[0], 0.05f);
 		ImGui::DragFloat3("Specular##sun", &sun.specular[0], 0.05f);
@@ -320,8 +341,11 @@ void beginFrameImGui()
 		ImGui::Spacing();
 	}
 
-	if (ImGui::TreeNode("Pointlight controls"))
+	if (pointLights.size() > 0 && ImGui::TreeNode("Pointlight controls"))
 	{
+		ImGui::SliderInt("Light##pointlight", &selectedPointLight, 0, pointLights.size() - 1);
+		PointLight& pointLight = pointLights[selectedPointLight];
+
 		ImGui::SliderFloat("Constant##pointlight", &pointLight.constant, 0.0f, 10.0f);
 		ImGui::SliderFloat("Linear##pointlight", &pointLight.linear, 0.0f, 1.0f);
 		ImGui::SliderFloat("Quadratic##pointlight", &pointLight.quadratic, 0.0f, 0.1f, "%.5f");
@@ -341,8 +365,11 @@ void beginFrameImGui()
 		ImGui::Spacing();
 	}
 
-	if (ImGui::TreeNode("Spotlight controls"))
+	if (spotLights.size() > 0 && ImGui::TreeNode("Spotlight controls"))
 	{
+		ImGui::SliderInt("Spotlight##spotlight", &selectedSpotLight, 0, spotLights.size() - 1);
+		SpotLight& spotLight = spotLights[selectedSpotLight];
+
 		ImGui::SliderFloat("Constant##spotlight", &spotLight.constant, 0.0f, 10.0f);
 		ImGui::SliderFloat("Linear##spotlight", &spotLight.linear, 0.0f, 1.0f);
 		ImGui::SliderFloat("Quadratic##spotlight", &spotLight.quadratic, 0.0f, 0.1f, "%.5f");

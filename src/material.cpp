@@ -21,70 +21,53 @@ void Material::SetVec4(const std::string& paramName, glm::vec4 value)
 		m_vec4Uniforms[location] = value;
 }
 
-void Material::ApplySun(const Sun& sun) const
+void Material::ApplySuns(const std::vector<Sun>& suns) const
 {
-	if (m_sunDirectionLocation >= 0)
-		glUniform3fv(m_sunDirectionLocation, 1, glm::value_ptr(sun.direction));
-
-	if (m_sunAmbientLocation >= 0)
-		glUniform3fv(m_sunAmbientLocation, 1, glm::value_ptr(sun.ambient));
-
-	if (m_sunDiffuseLocation >= 0)
-		glUniform3fv(m_sunDiffuseLocation, 1, glm::value_ptr(sun.diffuse));
-
-	if (m_sunSpecularLocation >= 0)
-		glUniform3fv(m_sunSpecularLocation, 1, glm::value_ptr(sun.specular));
+	m_shader.SetInt("sunsCount", suns.size());
+	for (int i = 0; i < suns.size(); i++)
+	{
+		const Sun& sun = suns[i];
+		const std::string member = "suns[" + std::to_string(i) + "]";
+		m_shader.SetVector3(member + ".direction", sun.direction);
+		m_shader.SetVector3(member + ".ambient", sun.ambient);
+		m_shader.SetVector3(member + ".diffuse", sun.diffuse);
+		m_shader.SetVector3(member + ".specular", sun.specular);
+	}
 }
 
-void Material::ApplyPointLight(const PointLight& pointLight) const
+void Material::ApplyPointLights(const std::vector<PointLight>& pointLights) const
 {
-	if (m_pointLightPositionLocation >= 0)
-		glUniform3fv(m_pointLightPositionLocation, 1, &pointLight.position[0]);
-
-	if (m_pointLightDiffuseLocation >= 0)
-		glUniform3fv(m_pointLightDiffuseLocation, 1, &pointLight.diffuse[0]);
-
-	if (m_pointLightSpecularLocation >= 0)
-		glUniform3fv(m_pointLightSpecularLocation, 1, &pointLight.specular[0]);
-
-	if (m_pointLightConstantLocation >= 0)
-		glUniform1f(m_pointLightConstantLocation, pointLight.constant);
-
-	if (m_pointLightLinearLocation >= 0)
-		glUniform1f(m_pointLightLinearLocation, pointLight.linear);
-
-	if (m_pointLightQuadraticLocation >= 0)
-		glUniform1f(m_pointLightQuadraticLocation, pointLight.quadratic);
+	m_shader.SetInt("pointLightsCount", pointLights.size());
+	for (int i = 0; i < pointLights.size(); i++)
+	{
+		const PointLight& pointLight = pointLights[i];
+		const std::string member = "pointLights[" + std::to_string(i) + "]";
+		m_shader.SetVector3(member + ".position", pointLight.position);
+		m_shader.SetVector3(member + ".diffuse", pointLight.diffuse);
+		m_shader.SetVector3(member + ".specular", pointLight.specular);
+		m_shader.SetFloat(member + ".constant", pointLight.constant);
+		m_shader.SetFloat(member + ".linear", pointLight.linear);
+		m_shader.SetFloat(member + ".quadratic", pointLight.quadratic);
+	}
 }
 
-void Material::ApplySpotLight(const SpotLight& spotLight) const
+void Material::ApplySpotLights(const std::vector<SpotLight>& spotLights) const
 {
-	if (m_spotLightPositionLocation >= 0)
-		glUniform3fv(m_spotLightPositionLocation, 1, &spotLight.position[0]);
-
-	if (m_spotLightDirectionLocation >= 0)
-		glUniform3fv(m_spotLightDirectionLocation, 1, &spotLight.direction[0]);
-
-	if (m_spotLightDiffuseLocation >= 0)
-		glUniform3fv(m_spotLightDiffuseLocation, 1, &spotLight.diffuse[0]);
-
-	if (m_spotLightSpecularLocation >= 0)
-		glUniform3fv(m_spotLightSpecularLocation, 1, &spotLight.specular[0]);
-
-	if (m_spotLightConstantLocation >= 0)
-		glUniform1f(m_spotLightConstantLocation, spotLight.constant);
-
-	if (m_spotLightLinearLocation >= 0)
-		glUniform1f(m_spotLightLinearLocation, spotLight.linear);
-
-	if (m_spotLightQuadraticLocation >= 0)
-		glUniform1f(m_spotLightQuadraticLocation, spotLight.quadratic);
-
-	if (m_spotLightInnerCutoffLocation >= 0)
-		glUniform1f(m_spotLightInnerCutoffLocation, spotLight.innerCutoff);
-
-	if (m_spotLightOuterCutoffLocation >= 0)
-		glUniform1f(m_spotLightOuterCutoffLocation, spotLight.outerCutoff);
+	m_shader.SetInt("spotLightsCount", spotLights.size());
+	for (int i = 0; i < spotLights.size(); i++)
+	{
+		const SpotLight& pointLight = spotLights[i];
+		const std::string member = "spotLights[" + std::to_string(i) + "]";
+		m_shader.SetVector3(member + ".position", pointLight.position);
+		m_shader.SetVector3(member + ".direction", pointLight.direction);
+		m_shader.SetVector3(member + ".diffuse", pointLight.diffuse);
+		m_shader.SetVector3(member + ".specular", pointLight.specular);
+		m_shader.SetFloat(member + ".constant", pointLight.constant);
+		m_shader.SetFloat(member + ".linear", pointLight.linear);
+		m_shader.SetFloat(member + ".quadratic", pointLight.quadratic);
+		m_shader.SetFloat(member + ".innerCutoff", pointLight.innerCutoff);
+		m_shader.SetFloat(member + ".outerCutoff", pointLight.outerCutoff);
+	}
 }
 
 void Material::InitializeStandardUniforms()
@@ -99,28 +82,6 @@ void Material::InitializeStandardUniforms()
 	if (m_specularMapLocation >= 0) glUniform1i(m_specularMapLocation, 1);
 	m_specularOverrideLocation = m_shader.GetPramLocation("material.specularOverride");
 	m_shininessLocation = m_shader.GetPramLocation("material.shininess");
-
-	m_sunDirectionLocation = m_shader.GetPramLocation("sun.direction");
-	m_sunAmbientLocation = m_shader.GetPramLocation("sun.ambient");
-	m_sunDiffuseLocation = m_shader.GetPramLocation("sun.diffuse");
-	m_sunSpecularLocation = m_shader.GetPramLocation("sun.specular");
-
-	m_pointLightPositionLocation = m_shader.GetPramLocation("pointLight.position");
-	m_pointLightDiffuseLocation = m_shader.GetPramLocation("pointLight.diffuse");
-	m_pointLightSpecularLocation = m_shader.GetPramLocation("pointLight.specular");
-	m_pointLightConstantLocation = m_shader.GetPramLocation("pointLight.constant");
-	m_pointLightLinearLocation = m_shader.GetPramLocation("pointLight.linear");
-	m_pointLightQuadraticLocation = m_shader.GetPramLocation("pointLight.quadratic");
-
-	m_spotLightPositionLocation = m_shader.GetPramLocation("spotLight.position");
-	m_spotLightDirectionLocation = m_shader.GetPramLocation("spotLight.direction");
-	m_spotLightDiffuseLocation = m_shader.GetPramLocation("spotLight.diffuse");
-	m_spotLightSpecularLocation = m_shader.GetPramLocation("spotLight.specular");
-	m_spotLightConstantLocation = m_shader.GetPramLocation("spotLight.constant");
-	m_spotLightLinearLocation = m_shader.GetPramLocation("spotLight.linear");
-	m_spotLightQuadraticLocation = m_shader.GetPramLocation("spotLight.quadratic");
-	m_spotLightInnerCutoffLocation = m_shader.GetPramLocation("spotLight.innerCutoff");
-	m_spotLightOuterCutoffLocation = m_shader.GetPramLocation("spotLight.outerCutoff");
 }
 
 void Material::ApplyUniforms() const
@@ -159,13 +120,15 @@ void Material::ApplyTextures() const
 	}
 }
 
-void Material::Use(const Sun& sun, const PointLight& pointLight, const SpotLight& spotLight) const
+void Material::Use(const std::vector<Sun>& suns,
+	const std::vector<PointLight>& pointLights,
+	const std::vector<SpotLight>& spotLights) const
 {
 	m_shader.Use();
 	ApplyUniforms();
 	ApplyTextures();
 
-	ApplySun(sun);
-	ApplyPointLight(pointLight);
-	ApplySpotLight(spotLight);
+	ApplySuns(suns);
+	ApplyPointLights(pointLights);
+	ApplySpotLights(spotLights);
 }

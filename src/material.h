@@ -20,7 +20,10 @@ public:
 	void SetFloat(const std::string& paramName, float value);
 	void SetVec4(const std::string& paramName, glm::vec4 value);
 
-	void Use(const Sun& sun, const PointLight& pointLight, const SpotLight& spotLight) const;
+	void Use(
+		const std::vector<Sun>& sun,
+		const std::vector<PointLight>& pointLight,
+		const std::vector<SpotLight>& spotLight) const;
 
 	unsigned int GetShaderId() const { return m_shader.GetId(); }
 
@@ -40,9 +43,9 @@ private:
 	void InitializeStandardUniforms();
 	void ApplyUniforms() const;
 	void ApplyTextures() const;
-	void ApplySun(const Sun& sun) const;
-	void ApplyPointLight(const PointLight& pointLight) const;
-	void ApplySpotLight(const SpotLight& spotLight) const;
+	void ApplySuns(const std::vector<Sun>& suns) const;
+	void ApplyPointLights(const std::vector<PointLight>& pointLight) const;
+	void ApplySpotLights(const std::vector<SpotLight>& spotLight) const;
 
 	std::map<int, float> m_floatUniforms;
 	std::map<int, glm::vec4> m_vec4Uniforms;
@@ -60,28 +63,6 @@ private:
 
 	float m_shininess{ 32 };
 	int m_shininessLocation = -1;
-
-	int m_sunDirectionLocation = -1;
-	int m_sunAmbientLocation = -1;
-	int m_sunDiffuseLocation = -1;
-	int m_sunSpecularLocation = -1;
-
-	int m_pointLightPositionLocation = -1;
-	int m_pointLightDiffuseLocation = -1;
-	int m_pointLightSpecularLocation = -1;
-	int m_pointLightConstantLocation = -1;
-	int m_pointLightLinearLocation = -1;
-	int m_pointLightQuadraticLocation = -1;
-
-	int m_spotLightPositionLocation = -1;
-	int m_spotLightDirectionLocation = -1;
-	int m_spotLightDiffuseLocation = -1;
-	int m_spotLightSpecularLocation = -1;
-	int m_spotLightConstantLocation = -1;
-	int m_spotLightLinearLocation = -1;
-	int m_spotLightQuadraticLocation = -1;
-	int m_spotLightInnerCutoffLocation = -1;
-	int m_spotLightOuterCutoffLocation = -1;
 
 	ShaderProgram m_shader;
 };

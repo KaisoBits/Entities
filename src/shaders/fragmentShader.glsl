@@ -19,6 +19,8 @@ struct Material
 };
 uniform Material material;
 
+#define MAX_LIGHTS 10
+
 struct Sun
 {
 	vec3 direction;
@@ -26,7 +28,8 @@ struct Sun
 	vec3 diffuse;
 	vec3 specular;
 };
-uniform Sun sun;
+uniform Sun suns[MAX_LIGHTS];
+uniform int sunsCount = 0;
 
 struct PointLight
 {
@@ -39,7 +42,8 @@ struct PointLight
 	float linear;
 	float quadratic;
 };
-uniform PointLight pointLight;
+uniform PointLight pointLights[MAX_LIGHTS];
+uniform int pointLightsCount = 0;
 
 struct SpotLight
 {
@@ -56,7 +60,8 @@ struct SpotLight
 	float innerCutoff;
 	float outerCutoff;
 };
-uniform SpotLight spotLight;
+uniform SpotLight spotLights[MAX_LIGHTS];
+uniform int spotLightsCount = 0;
 
 float getDiffuseLightStrength(vec3 lightDirection) {
 	float dotResult = dot(normalVector, -normalize(lightDirection));
@@ -84,34 +89,51 @@ void main()
 		vec3(0.5) : vec3(texture(material.specularMap, textureCoord));
 
 	// Sun light
-	vec3 ambientLight = sun.ambient * diffuseMaterialStrength;
-	vec3 diffuseLight = sun.diffuse * getDiffuseLightStrength(sun.direction) * diffuseMaterialStrength;
-	vec3 specularLight = sun.specular * getSpecularLightStrength(sun.direction) * specularMaterialStrength;
+	vec3 ambientLight = vec3(0);
+	vec3 diffuseLight = vec3(0);
+	vec3 specularLight = vec3(0);
+	for (int i = 0; i < sunsCount && i < MAX_LIGHTS; i++)
+	{
+		ambientLight += suns[i].ambient * diffuseMaterialStrength;
+		diffuseLight += suns[i].diffuse * getDiffuseLightStrength(suns[i].direction) * diffuseMaterialStrength;
+		specularLight += suns[i].specular * getSpecularLightStrength(suns[i].direction) * specularMaterialStrength;
+	}
 
 	// Point light
-	float distanceToPointLight = distance(fragmentPosition, pointLight.position);
-	float pointLightAttenuation = getAttenuation(distanceToPointLight, pointLight.constant, pointLight.linear, pointLight.quadratic);
-	vec3 diffusePointLight = pointLight.diffuse * pointLightAttenuation  * 
-		getDiffuseLightStrength(fragmentPosition - pointLight.position) * diffuseMaterialStrength;
-	vec3 specularPointLight = pointLight.specular * pointLightAttenuation  * 
-		getSpecularLightStrength(fragmentPosition - pointLight.position)  * specularMaterialStrength;
+	vec3 diffusePointLight = vec3(0);
+	vec3 specularPointLight = vec3(0);
+	for (int i = 0; i < pointLightsCount && i < MAX_LIGHTS; i++)
+	{
+		float distanceToPointLight = distance(fragmentPosition, pointLights[i].position);
+		float pointLightAttenuation = getAttenuation(distanceToPointLight, pointLights[i].constant, pointLights[i].linear, pointLights[i].quadratic);
+		diffusePointLight += pointLights[i].diffuse * pointLightAttenuation * 
+			getDiffuseLightStrength(fragmentPosition - pointLights[i].position) * diffuseMaterialStrength;
+		specularPointLight += pointLights[i].specular * pointLightAttenuation  * 
+			getSpecularLightStrength(fragmentPosition - pointLights[i].position)  * specularMaterialStrength;
+	}
 
 	// Spot light
-	float distanceToSpotLight = distance(fragmentPosition, spotLight.position);
-	float spotLightAttenuation = getAttenuation(distanceToSpotLight, spotLight.constant, spotLight.linear, spotLight.quadratic);
-	vec3 diffuseSpotLight = spotLight.diffuse * spotLightAttenuation * 
-		getDiffuseLightStrength(fragmentPosition - spotLight.position) * diffuseMaterialStrength;
-	vec3 specularSpotLight = spotLight.specular * spotLightAttenuation * 
-		getSpecularLightStrength(fragmentPosition - spotLight.position)  * specularMaterialStrength;
+	vec3 diffuseSpotLight = vec3(0);
+	vec3 specularSpotLight = vec3(0);
+	for (int i = 0; i < spotLightsCount && i < MAX_LIGHTS; i++)
+	{
+		float distanceToSpotLight = distance(fragmentPosition, spotLights[i].position);
+		float spotLightAttenuation = getAttenuation(distanceToSpotLight, spotLights[i].constant, spotLights[i].linear, spotLights[i].quadratic);
 
-	vec3 toSpotLight = normalize(spotLight.position - fragmentPosition);
-	float angle = dot(toSpotLight, -normalize(spotLight.direction));
-	float spotLighAngleModifier = clamp((angle - spotLight.outerCutoff) / (spotLight.innerCutoff - spotLight.outerCutoff), 0, 1);
+		vec3 toSpotLight = normalize(spotLights[i].position - fragmentPosition);
+		float angle = dot(toSpotLight, -normalize(spotLights[i].direction));
+		float spotLighAngleModifier = clamp((angle - spotLights[i].outerCutoff) / (spotLights[i].innerCutoff - spotLights[i].outerCutoff), 0, 1);
+
+		diffuseSpotLight += spotLights[i].diffuse * spotLightAttenuation * 
+			getDiffuseLightStrength(fragmentPosition - spotLights[i].position) * diffuseMaterialStrength * spotLighAngleModifier;
+		specularSpotLight += spotLights[i].specular * spotLightAttenuation * 
+			getSpecularLightStrength(fragmentPosition - spotLights[i].position)  * specularMaterialStrength * spotLighAngleModifier;
+	}
 
 	// Combine
-	vec3 sunLight = ambientLight + diffuseLight + specularLight;
-	vec3 pointLight = diffusePointLight + specularPointLight;
-	vec3 spotLight = (diffuseSpotLight + specularSpotLight) * spotLighAngleModifier;
+	vec3 sunLights = ambientLight + diffuseLight + specularLight;
+	vec3 pointLights = diffusePointLight + specularPointLight;
+	vec3 spotLights = diffuseSpotLight + specularSpotLight;
 
-	FragColor = vec4(sunLight + pointLight + spotLight, 1.0);
+	FragColor = vec4(sunLights + pointLights + spotLights, 1.0);
 }
