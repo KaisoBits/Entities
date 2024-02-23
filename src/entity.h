@@ -48,7 +48,7 @@ public:
 	bool GetIsHighlighted() const { return m_highlighted; }
 
 private:
-	void ApplyPositionAndRotation(ShaderProgram& shader, float scaleMult = 1.0f) const;
+	void ApplyPositionAndRotation(ShaderProgram& shader, float scaleIncrease = 0.0f) const;
 
 	const Model* m_model;
 	Material m_material;
