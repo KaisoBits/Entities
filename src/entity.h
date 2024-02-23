@@ -15,9 +15,9 @@ class Entity
 {
 public:
 	explicit Entity(const Model* model, Material material) :
-		m_model(model), m_material(std::move(material)) {}
+		m_model(model), m_material(std::move(material)), m_highlighted(false) {}
 
-	void Draw(const Camera& camera, 
+	void Draw(const Camera& camera,
 		const std::vector<Sun>& sun,
 		const std::vector<PointLight>& pointLight,
 		const std::vector<SpotLight>& spotLight) const;
@@ -42,8 +42,10 @@ public:
 	void SetUpdateFunc(
 		std::function<void(Entity* entity, float deltaTime)> updateFunc);
 
+	void SetHighlighted(bool highlighted) { m_highlighted = highlighted; }
+
 private:
-	void ApplyPositionAndRotation() const;
+	void ApplyPositionAndRotation(ShaderProgram& shader, float scaleMult = 1.0f) const;
 
 	const Model* m_model;
 	Material m_material;
@@ -53,4 +55,6 @@ private:
 	glm::vec3 m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	std::optional<std::function<void(Entity* entity, float deltaTime)>> m_updateFunc;
+
+	bool m_highlighted;
 };

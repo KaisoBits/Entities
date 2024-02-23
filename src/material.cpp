@@ -57,7 +57,7 @@ void Material::ApplySpotLights(const std::vector<SpotLight>& spotLights) const
 	}
 }
 
-void Material::ApplyUniforms() const
+void Material::ApplyMaterial() const
 {
 	m_shader->SetVector3("material.color", m_color);
 	m_shader->SetInt("material.diffuseMap", 0);
@@ -89,10 +89,18 @@ void Material::Use(const std::vector<Sun>& suns,
 	const std::vector<SpotLight>& spotLights) const
 {
 	m_shader->Use();
-	ApplyUniforms();
+	ApplyMaterial();
 	ApplyTextures();
 
 	ApplySuns(suns);
 	ApplyPointLights(pointLights);
 	ApplySpotLights(spotLights);
+}
+
+void Material::UseHighlight() const
+{
+	if (!m_highlightShader)
+		return;
+
+	m_highlightShader->Use();
 }

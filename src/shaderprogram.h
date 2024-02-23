@@ -23,11 +23,13 @@ public:
 	void SetVector3(const std::string& paramName, const glm::vec3& value);
 	void SetVector2(const std::string& paramName, const glm::vec2& value);
 	void SetMat4(const std::string& paramName, const glm::mat4& value);
+	void SetVerboseLogging(bool verboseLogging) { m_verboseLogging = verboseLogging; }
 
 private:
 	explicit ShaderProgram(unsigned int programId) : m_programId(programId) {}
 
 	unsigned int m_programId = 0;
+	bool m_verboseLogging = false;
 
 	mutable std::unordered_map<std::string, int> m_shaderLocationCache;
 	using ShaderValue = std::variant<glm::vec3, glm::vec2, glm::mat4, int, float>;

@@ -15,12 +15,14 @@ class Material
 {
 public:
 	Material() = delete;
-	Material(ShaderProgram* shader) : m_shader(shader) { }
+	Material(ShaderProgram* shader, ShaderProgram* highlightShader) :
+		m_shader(shader), m_highlightShader(highlightShader) { }
 
 	void Use(
 		const std::vector<Sun>& sun,
 		const std::vector<PointLight>& pointLight,
 		const std::vector<SpotLight>& spotLight) const;
+	void UseHighlight() const;
 
 	void SetColor(glm::vec3 color) { m_color = color; }
 	[[nodiscard]] glm::vec3 GetColor() const { return m_color; }
@@ -35,9 +37,10 @@ public:
 	[[nodiscard]] float GetShininess() const { return m_shininess; }
 
 	[[nodiscard]] ShaderProgram& GetShader() const { return *m_shader; }
+	[[nodiscard]] ShaderProgram& GetHighlightShader() const { return *m_highlightShader; }
 
 private:
-	void ApplyUniforms() const;
+	void ApplyMaterial() const;
 	void ApplyTextures() const;
 	void ApplySuns(const std::vector<Sun>& suns) const;
 	void ApplyPointLights(const std::vector<PointLight>& pointLight) const;
@@ -58,6 +61,7 @@ private:
 	int m_shininessLocation = -1;
 
 	ShaderProgram* m_shader;
+	ShaderProgram* m_highlightShader;
 
 	static const Texture* m_lastBoundTexture1;
 	static const Texture* m_lastBoundTexture2;

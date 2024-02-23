@@ -127,10 +127,12 @@ int main()
 
 	std::string vertexShader = readFileAsString("shaders/vertexShader.glsl");
 	std::string fragmentShader = readFileAsString("shaders/fragmentShader.glsl");
+	std::string highlightFragmentShader = readFileAsString("shaders/highlightShader.glsl");
 
 	ShaderProgram sp = ShaderProgram::Compile(vertexShader, fragmentShader);
+	ShaderProgram hs = ShaderProgram::Compile(vertexShader, highlightFragmentShader);
 	const Model model = ObjParser::LoadFromFile("resources/models/cube.obj");
-	Material material1(&sp);
+	Material material1(&sp, &hs);
 	const Texture textureColor = Texture::LoadFromFile("resources/textures/container_color.png");
 	const Texture textureSpecular = Texture::LoadFromFile("resources/textures/container_specular.png");
 	material1.SetDiffuseMap(&textureColor);
@@ -145,6 +147,8 @@ int main()
 			Entity e(&model, material1);
 			e.SetPosition(glm::vec3(i * 20, 0, j * 20));
 			e.SetScale(glm::vec3(5));
+			if (i == 1 && j == 1)
+				e.SetHighlighted(true);
 			e.SetUpdateFunc(
 				[value](Entity* e, float deltaTime) mutable {
 					constexpr float animationHeight = 10.0f;
@@ -163,7 +167,7 @@ int main()
 	}
 
 	const Model groundModel = ObjParser::LoadFromFile("resources/models/ground.obj");
-	Material groundMaterial(&sp);
+	Material groundMaterial(&sp, &hs);
 	groundMaterial.SetShininess(16);
 	const Texture groundTexture = Texture::LoadFromFile("resources/textures/ground_color.jpg");
 	const Texture groundSpecTexture = Texture::LoadFromFile("resources/textures/ground_spec.jpg");
@@ -187,8 +191,10 @@ int main()
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_STENCIL_TEST);
 
 	glCullFace(GL_BACK);
+	glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
 
 	double lastTime = glfwGetTime();
 	while (!glfwWindowShouldClose(window))
@@ -197,7 +203,9 @@ int main()
 		double deltaTime = fmin(now - lastTime, 0.3f);
 		lastTime = now;
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glStencilMask(0xFF);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		glStencilMask(0x00);
 
 		glfwPollEvents();
 

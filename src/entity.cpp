@@ -14,13 +14,35 @@ void Entity::Draw(const Camera& camera,
 
 	m_material.Use(suns, pointLights, spotLights);
 
-	ApplyPositionAndRotation();
+	ApplyPositionAndRotation(m_material.GetShader());
 	camera.Apply(m_material.GetShader());
 
-	m_model->Draw();
+	if (m_highlighted)
+	{
+		glStencilMask(0xFF);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		m_model->Draw();
+
+		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		glStencilMask(0x00);
+		glDepthRange(0, 0);
+
+		m_material.UseHighlight();
+		ApplyPositionAndRotation(m_material.GetHighlightShader(), 1.1f);
+		camera.Apply(m_material.GetHighlightShader());
+		m_model->Draw();
+		glDepthRange(0, 1);
+
+		glStencilMask(0xFF);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	}
+	else
+	{
+		m_model->Draw();
+	}
 }
 
-void Entity::ApplyPositionAndRotation() const
+void Entity::ApplyPositionAndRotation(ShaderProgram& shader, float scaleMult) const
 {
 	glm::mat4 modelMatrix =
 		glm::scale(
@@ -32,9 +54,7 @@ void Entity::ApplyPositionAndRotation() const
 					m_rotation.z, glm::vec3(0.0f, 0.0f, 1.0f)
 				),
 				m_rotation.x, glm::vec3(1.0f, 0.0f, 0.0f)),
-			m_scale);
-
-	ShaderProgram& shader = m_material.GetShader();
+			m_scale * scaleMult);
 
 	shader.SetMat4("model", modelMatrix);
 }
