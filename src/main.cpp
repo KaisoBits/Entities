@@ -158,7 +158,7 @@ int main()
 					position.y = sin(value) * animationHeight;
 					// e->SetPosition(position);
 
-					e->SetRotation(glm::vec3(value / 6.0, value / 8.0f, value / 10.0f));
+					e->SetRotation(glm::vec3(value * 6.0, value * 8.0f, value * 10.0f));
 
 					value += 2.0f * deltaTime;
 				});

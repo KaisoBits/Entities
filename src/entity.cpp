@@ -48,10 +48,10 @@ void Entity::ApplyPositionAndRotation(ShaderProgram& shader, float scaleIncrease
 				glm::rotate(
 					glm::rotate(
 						glm::translate(glm::mat4(1.0f), m_position),
-						m_rotation.y, glm::vec3(0.0f, 1.0f, 0.0f)),
-					m_rotation.z, glm::vec3(0.0f, 0.0f, 1.0f)
+						glm::radians(m_rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)),
+					glm::radians(m_rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)
 				),
-				m_rotation.x, glm::vec3(1.0f, 0.0f, 0.0f)),
+				glm::radians(m_rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)),
 			m_scale + glm::vec3(scaleIncrease));
 
 	shader.SetMat4("model", modelMatrix);
