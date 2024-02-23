@@ -97,6 +97,9 @@ std::vector<SpotLight> spotLights = {
 	}
 };
 
+std::optional<Model> model;
+std::optional<Material> material1;
+
 int main()
 {
 	if (!glfwInit())
@@ -131,12 +134,12 @@ int main()
 
 	ShaderProgram sp = ShaderProgram::Compile(vertexShader, fragmentShader);
 	ShaderProgram hs = ShaderProgram::Compile(vertexShader, highlightFragmentShader);
-	const Model model = ObjParser::LoadFromFile("resources/models/cube.obj");
-	Material material1(&sp, &hs);
+	model = ObjParser::LoadFromFile("resources/models/cube.obj");
+	material1 = Material(&sp, &hs);
 	const Texture textureColor = Texture::LoadFromFile("resources/textures/container_color.png");
 	const Texture textureSpecular = Texture::LoadFromFile("resources/textures/container_specular.png");
-	material1.SetDiffuseMap(&textureColor);
-	material1.SetSpecularMap(&textureSpecular);
+	material1->SetDiffuseMap(&textureColor);
+	material1->SetSpecularMap(&textureSpecular);
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -144,11 +147,9 @@ int main()
 		{
 			float value = static_cast<float>(i + j) / 2.0f;
 
-			Entity e(&model, material1);
+			Entity e(&model.value(), material1.value());
 			e.SetPosition(glm::vec3(i * 20, 0, j * 20));
 			e.SetScale(glm::vec3(5));
-			if (i == 1 && j == 1)
-				e.SetHighlighted(true);
 			e.SetUpdateFunc(
 				[value](Entity* e, float deltaTime) mutable {
 					constexpr float animationHeight = 10.0f;
@@ -315,6 +316,7 @@ void initImGui(GLFWwindow* window)
 	ImGui_ImplOpenGL3_Init();
 }
 
+int selectedEntity = 0;
 int selectedSun = 0;
 int selectedPointLight = 0;
 int selectedSpotLight = 0;
@@ -328,6 +330,69 @@ void beginFrameImGui()
 	ImGui::NewFrame();
 
 	ImGui::Begin("Debug menu");
+
+	if (ImGui::TreeNode("Entities"))
+	{
+		if (entities.size() > 0)
+		{
+			ImGui::SliderInt("Selected##entity", &selectedEntity, 0, entities.size() - 1);
+			Entity& entity = entities[selectedEntity];
+
+			ImGui::Spacing();
+
+			glm::vec3 entityPosition = entity.GetPosition();
+			glm::vec3 entityRotation = entity.GetRotation();
+			glm::vec3 entityScale = entity.GetScale();
+			bool entityShouldUpdate = entity.GetShouldUpdate();
+			ImGui::DragFloat3("Position##entity", &entityPosition[0], 0.05f);
+			ImGui::DragFloat3("Rotation##entity", &entityRotation[0], 0.05f);
+			ImGui::DragFloat3("Scale##entity", &entityScale[0], 0.05f);
+			ImGui::Checkbox("Update##entity", &entityShouldUpdate);
+			entity.SetPosition(entityPosition);
+			entity.SetRotation(entityRotation);
+			entity.SetScale(entityScale);
+			entity.SetShouldUpdate(entityShouldUpdate);
+
+			if (ImGui::Button("Move to camera##entity"))
+			{
+				entity.SetPosition(mainCam.GetPosition());
+			}
+			ImGui::SameLine();
+		}
+		if (ImGui::Button("Add##entity"))
+		{
+			float value = 0;
+			Entity e(&model.value(), material1.value());
+			e.SetPosition(mainCam.GetPosition());
+			e.SetUpdateFunc(
+				[value](Entity* e, float deltaTime) mutable {
+					constexpr float animationHeight = 10.0f;
+
+					glm::vec3 position = e->GetPosition();
+					position.y = sin(value) * animationHeight;
+
+					e->SetRotation(glm::vec3(value / 6.0, value / 8.0f, value / 10.0f));
+
+					value += 2.0f * deltaTime;
+				});
+
+			entities.push_back(std::move(e));
+
+			selectedEntity = entities.size() - 1;
+		}
+		ImGui::SameLine();
+		if (entities.size() > 0 && ImGui::Button("Delete##entity"))
+		{
+			entities.erase(entities.begin() + selectedEntity);
+			if (selectedEntity == entities.size())
+				selectedEntity--;
+		}
+		ImGui::TreePop();
+		ImGui::Spacing();
+
+		entities[selectedEntity].HighlightThisFrame();
+	}
+
 	if (ImGui::TreeNode("Sun controls"))
 	{
 		if (suns.size() > 0)

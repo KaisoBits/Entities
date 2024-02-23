@@ -17,8 +17,10 @@ void Entity::Draw(const Camera& camera,
 	ApplyPositionAndRotation(m_material.GetShader());
 	camera.Apply(m_material.GetShader());
 
-	if (m_highlighted)
+	if (m_highlightedThisFrame)
 	{
+		m_highlightedThisFrame = false;
+
 		glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
 		m_model->Draw();
 
@@ -59,7 +61,7 @@ void Entity::ApplyPositionAndRotation(ShaderProgram& shader, float scaleMult) co
 
 void Entity::Update(float deltaTime)
 {
-	if (m_updateFunc)
+	if (m_shouldUpdate && m_updateFunc)
 	{
 		(*m_updateFunc)(this, deltaTime);
 	}
