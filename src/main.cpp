@@ -216,6 +216,10 @@ int main()
 		{
 			entity.Update(static_cast<float>(deltaTime));
 			entity.Draw(mainCam, suns, pointLights, spotLights);
+
+			// Clear menu highlight
+			if (imGuiMenuOpen && entity.GetIsHighlighted())
+				entity.SetIstHighlighted(false);
 		}
 
 		endFrameImGui();
@@ -390,7 +394,7 @@ void beginFrameImGui()
 		ImGui::TreePop();
 		ImGui::Spacing();
 
-		entities[selectedEntity].HighlightThisFrame();
+		entities[selectedEntity].SetIstHighlighted(true);
 	}
 
 	if (ImGui::TreeNode("Sun controls"))

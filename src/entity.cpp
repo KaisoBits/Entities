@@ -17,10 +17,8 @@ void Entity::Draw(const Camera& camera,
 	ApplyPositionAndRotation(m_material.GetShader());
 	camera.Apply(m_material.GetShader());
 
-	if (m_highlightedThisFrame)
+	if (m_highlighted)
 	{
-		m_highlightedThisFrame = false;
-
 		glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
 		m_model->Draw();
 

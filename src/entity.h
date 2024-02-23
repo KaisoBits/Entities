@@ -15,7 +15,7 @@ class Entity
 {
 public:
 	explicit Entity(const Model* model, Material material) :
-		m_model(model), m_material(std::move(material)), m_highlightedThisFrame(false) {}
+		m_model(model), m_material(std::move(material)), m_highlighted(false) {}
 
 	void Draw(const Camera& camera,
 		const std::vector<Sun>& sun,
@@ -44,8 +44,8 @@ public:
 	bool GetShouldUpdate() { return m_shouldUpdate; }
 	void SetShouldUpdate(bool shouldUpdate) { m_shouldUpdate = shouldUpdate; }
 
-
-	void HighlightThisFrame() { m_highlightedThisFrame = true; }
+	void SetIstHighlighted(bool highlighted) { m_highlighted = highlighted; }
+	bool GetIsHighlighted() const { return m_highlighted; }
 
 private:
 	void ApplyPositionAndRotation(ShaderProgram& shader, float scaleMult = 1.0f) const;
@@ -60,5 +60,5 @@ private:
 	std::optional<std::function<void(Entity* entity, float deltaTime)>> m_updateFunc;
 	bool m_shouldUpdate = true;
 
-	mutable bool m_highlightedThisFrame;
+	bool m_highlighted;
 };
