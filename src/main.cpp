@@ -194,7 +194,7 @@ int main()
 	glEnable(GL_STENCIL_TEST);
 
 	glCullFace(GL_BACK);
-	glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
 	double lastTime = glfwGetTime();
 	while (!glfwWindowShouldClose(window))
@@ -203,9 +203,7 @@ int main()
 		double deltaTime = fmin(now - lastTime, 0.3f);
 		lastTime = now;
 
-		glStencilMask(0xFF);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		glStencilMask(0x00);
 
 		glfwPollEvents();
 

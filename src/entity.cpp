@@ -19,12 +19,11 @@ void Entity::Draw(const Camera& camera,
 
 	if (m_highlighted)
 	{
-		glStencilMask(0xFF);
-		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
 		m_model->Draw();
 
+		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-		glStencilMask(0x00);
 		glDepthRange(0, 0);
 
 		m_material.UseHighlight();
@@ -33,7 +32,6 @@ void Entity::Draw(const Camera& camera,
 		m_model->Draw();
 		glDepthRange(0, 1);
 
-		glStencilMask(0xFF);
 		glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	}
 	else
