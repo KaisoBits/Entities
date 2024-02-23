@@ -2,7 +2,7 @@
 
 #include "model.h"
 
-unsigned int Model::m_currentlyBoundBuffer = 0;
+unsigned int Model::s_currentlyBoundBuffer = 0;
 
 Model Model::Create(const std::vector<float>& vertices, const std::vector<float>& uvs, const std::vector<float>& normals)
 {
@@ -36,9 +36,9 @@ Model Model::Create(const std::vector<float>& vertices, const std::vector<float>
 
 void Model::Draw() const
 {
-	if (m_currentlyBoundBuffer != m_buffer)
+	if (s_currentlyBoundBuffer != m_buffer)
 	{
-		m_currentlyBoundBuffer = m_buffer;
+		s_currentlyBoundBuffer = m_buffer;
 		glBindVertexArray(m_buffer);
 	}
 	glDrawArrays(GL_TRIANGLES, 0, m_verticesCount);

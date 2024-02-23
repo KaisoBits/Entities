@@ -63,6 +63,6 @@ private:
 	ShaderProgram* m_shader;
 	ShaderProgram* m_highlightShader;
 
-	static const Texture* m_lastBoundTexture1;
-	static const Texture* m_lastBoundTexture2;
+	static const Texture* s_lastBoundTexture1;
+	static const Texture* s_lastBoundTexture2;
 };

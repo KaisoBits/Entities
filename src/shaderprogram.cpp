@@ -3,7 +3,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
-unsigned int ShaderProgram::m_currentlyUsedShader = 0;
+unsigned int ShaderProgram::s_currentlyUsedShader = 0;
 
 ShaderProgram ShaderProgram::Compile(const std::string& vertexShaderSource, const std::string& fragmentShaderSource)
 {
@@ -75,9 +75,9 @@ int ShaderProgram::GetPramLocation(const std::string& paramName) const
 void ShaderProgram::Use() const
 {
 	unsigned int id = GetId();
-	if (m_currentlyUsedShader != id)
+	if (s_currentlyUsedShader != id)
 	{
-		m_currentlyUsedShader = id;
+		s_currentlyUsedShader = id;
 		glUseProgram(m_programId);
 	}
 }

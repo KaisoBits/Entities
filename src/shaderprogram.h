@@ -35,5 +35,5 @@ private:
 	using ShaderValue = std::variant<glm::vec3, glm::vec2, glm::mat4, int, float>;
 	mutable std::unordered_map<std::string, ShaderValue> m_shaderValueCache;
 
-	static unsigned int m_currentlyUsedShader;
+	static unsigned int s_currentlyUsedShader;
 };

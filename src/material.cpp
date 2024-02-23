@@ -5,8 +5,8 @@
 
 #include "material.h"
 
-const Texture* Material::m_lastBoundTexture1 = nullptr;
-const Texture* Material::m_lastBoundTexture2 = nullptr;
+const Texture* Material::s_lastBoundTexture1 = nullptr;
+const Texture* Material::s_lastBoundTexture2 = nullptr;
 
 void Material::ApplySuns(const std::vector<Sun>& suns) const
 {
@@ -69,16 +69,16 @@ void Material::ApplyMaterial() const
 
 void Material::ApplyTextures() const
 {
-	if (m_diffuseMap && m_lastBoundTexture1 != m_diffuseMap)
+	if (m_diffuseMap && s_lastBoundTexture1 != m_diffuseMap)
 	{
-		m_lastBoundTexture1 = m_diffuseMap;
+		s_lastBoundTexture1 = m_diffuseMap;
 		glActiveTexture(GL_TEXTURE0);
 		m_diffuseMap->Use();
 	}
 
-	if (m_specularMap && m_lastBoundTexture2 != m_specularMap)
+	if (m_specularMap && s_lastBoundTexture2 != m_specularMap)
 	{
-		m_lastBoundTexture2 = m_specularMap;
+		s_lastBoundTexture2 = m_specularMap;
 		glActiveTexture(GL_TEXTURE1);
 		m_specularMap->Use();
 	}

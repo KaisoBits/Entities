@@ -21,5 +21,5 @@ private:
 	unsigned int m_buffer;
 	unsigned long long m_verticesCount;
 
-	static unsigned int m_currentlyBoundBuffer;
+	static unsigned int s_currentlyBoundBuffer;
 };
