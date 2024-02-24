@@ -28,6 +28,11 @@ Texture Texture::LoadFromFile(const std::string& path)
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	if (GLAD_GL_EXT_texture_filter_anisotropic) {
+		GLfloat maxAnisotropy;
+		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+	}
 
 	if (channelsCount == 1)
 	{
