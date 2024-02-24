@@ -135,7 +135,7 @@ int main()
 		Model model = ObjParser::LoadFromFile("resources/models/cube.obj");
 		const Texture textureColor = Texture::LoadFromFile("resources/textures/container_color.png");
 		const Texture textureSpecular = Texture::LoadFromFile("resources/textures/container_specular.png");
-		Material material = Material(&sp, &hs);
+		Material material(&sp, &hs);
 		material.SetDiffuseMap(&textureColor);
 		material.SetSpecularMap(&textureSpecular);
 
