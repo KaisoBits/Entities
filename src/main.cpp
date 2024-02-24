@@ -219,7 +219,7 @@ int main()
 
 			// Clear menu highlight
 			if (imGuiMenuOpen && entity.GetIsHighlighted())
-				entity.SetIstHighlighted(false);
+				entity.SetIsHighlighted(false);
 		}
 
 		endFrameImGui();
@@ -375,7 +375,7 @@ void beginFrameImGui()
 					glm::vec3 position = e->GetPosition();
 					position.y = sin(value) * animationHeight;
 
-					e->SetRotation(glm::vec3(value / 6.0, value / 8.0f, value / 10.0f));
+					e->SetRotation(glm::vec3(value * 6.0, value * 8.0f, value * 10.0f));
 
 					value += 2.0f * deltaTime;
 				});
@@ -394,7 +394,7 @@ void beginFrameImGui()
 		ImGui::TreePop();
 		ImGui::Spacing();
 
-		entities[selectedEntity].SetIstHighlighted(true);
+		entities[selectedEntity].SetIsHighlighted(true);
 	}
 
 	if (ImGui::TreeNode("Sun controls"))

@@ -41,11 +41,11 @@ public:
 
 	void SetUpdateFunc(
 		std::function<void(Entity* entity, float deltaTime)> updateFunc);
-	bool GetShouldUpdate() { return m_shouldUpdate; }
+	[[nodiscard]] bool GetShouldUpdate() const { return m_shouldUpdate; }
 	void SetShouldUpdate(bool shouldUpdate) { m_shouldUpdate = shouldUpdate; }
 
-	void SetIstHighlighted(bool highlighted) { m_highlighted = highlighted; }
-	bool GetIsHighlighted() const { return m_highlighted; }
+	void SetIsHighlighted(bool highlighted) { m_highlighted = highlighted; }
+	[[nodiscard]] bool GetIsHighlighted() const { return m_highlighted; }
 
 private:
 	void ApplyPositionAndRotation(ShaderProgram& shader, float scaleIncrease = 0.0f) const;
