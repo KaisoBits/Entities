@@ -63,16 +63,6 @@ public:
 		return glm::cross(ForwardJustYaw(), Up());
 	}
 
-	void Apply(ShaderProgram& shader) const
-	{
-		shader.SetMat4("view", GetMatrix());
-
-		glm::mat4 perspective =
-			glm::perspective(glm::radians(m_fovY), m_aspectRatio, 0.1f, 1000.0f);
-		shader.SetMat4("perspective", perspective);
-		shader.SetVector3("cameraPosition", m_position);
-	}
-
 private:
 	glm::vec2 m_rotation = glm::vec2(0, 0);
 	glm::vec3 m_position = glm::vec3(0, 0, 0);

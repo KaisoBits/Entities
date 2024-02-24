@@ -15,7 +15,7 @@ void Entity::Draw(const Camera& camera,
 	m_material.Use(suns, pointLights, spotLights);
 
 	ApplyPositionAndRotation(m_material.GetShader());
-	camera.Apply(m_material.GetShader());
+	ApplyCamera(m_material.GetShader(), camera);
 
 	if (m_highlighted)
 	{
@@ -28,7 +28,7 @@ void Entity::Draw(const Camera& camera,
 
 		m_material.UseHighlight();
 		ApplyPositionAndRotation(m_material.GetHighlightShader(), .2f);
-		camera.Apply(m_material.GetHighlightShader());
+		ApplyCamera(m_material.GetHighlightShader(), camera);
 		m_model->Draw();
 		glDepthRange(0, 1);
 
@@ -55,6 +55,16 @@ void Entity::ApplyPositionAndRotation(ShaderProgram& shader, float scaleIncrease
 			m_scale + glm::vec3(scaleIncrease));
 
 	shader.SetMat4("model", modelMatrix);
+}
+
+void Entity::ApplyCamera(ShaderProgram& shader, const Camera& camera) const
+{
+	shader.SetMat4("view", camera.GetMatrix());
+
+	glm::mat4 perspective =
+		glm::perspective(glm::radians(camera.GetFovY()), camera.GetAspectRatio(), 0.1f, 1000.0f);
+	shader.SetMat4("perspective", perspective);
+	shader.SetVector3("cameraPosition", camera.GetPosition());
 }
 
 void Entity::Update(float deltaTime)

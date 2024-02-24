@@ -49,6 +49,7 @@ public:
 
 private:
 	void ApplyPositionAndRotation(ShaderProgram& shader, float scaleIncrease = 0.0f) const;
+	void ApplyCamera(ShaderProgram& shader, const Camera& camera) const;
 
 	const Model* m_model;
 	Material m_material;
