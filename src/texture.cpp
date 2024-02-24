@@ -26,6 +26,9 @@ Texture Texture::LoadFromFile(const std::string& path)
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
 	if (channelsCount == 1)
 	{
 		// Grayscale to rgb
