@@ -34,6 +34,37 @@ Model Model::Create(const std::vector<float>& vertices, const std::vector<float>
 	return Model(vertexArrayObject, vertices.size() / 3);
 }
 
+Model::~Model()
+{
+	if (m_buffer != 0)
+	{
+		glDeleteBuffers(1, &m_buffer);
+	}
+}
+
+Model::Model(Model&& other) noexcept
+{
+	m_buffer = other.m_buffer;
+	m_verticesCount = other.m_verticesCount;
+
+	other.m_buffer = 0;
+	other.m_verticesCount = 0;
+}
+
+Model& Model::operator= (Model&& other) noexcept
+{
+	if (this == &other)
+		return *this;
+
+	m_buffer = other.m_buffer;
+	m_verticesCount = other.m_verticesCount;
+
+	other.m_buffer = 0;
+	other.m_verticesCount = 0;
+
+	return *this;
+}
+
 void Model::Draw() const
 {
 	if (s_currentlyBoundBuffer != m_buffer)

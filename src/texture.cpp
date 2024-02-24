@@ -62,6 +62,31 @@ Texture Texture::LoadFromFile(const std::string& path)
 	return Texture(texture);
 }
 
+Texture::~Texture()
+{
+	if (m_texture != 0)
+	{
+		glDeleteTextures(1, &m_texture);
+	}
+}
+
+Texture::Texture(Texture&& other) noexcept
+{
+	m_texture = other.m_texture;
+	other.m_texture = 0;
+}
+
+Texture& Texture::operator=(Texture&& other) noexcept
+{
+	if (this == &other)
+		return *this;
+
+	m_texture = other.m_texture;
+	other.m_texture = 0;
+
+	return *this;
+}
+
 void Texture::Use() const
 {
 	glBindTexture(GL_TEXTURE_2D, m_texture);

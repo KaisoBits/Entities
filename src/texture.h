@@ -9,6 +9,10 @@ public:
     static Texture Empty() { return Texture(0); }
 
     Texture() = delete;
+    ~Texture();
+
+    Texture(Texture&& other) noexcept;
+    Texture& operator=(Texture&& other) noexcept;
 
     void Use() const;
 

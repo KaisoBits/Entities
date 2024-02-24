@@ -55,6 +55,42 @@ ShaderProgram ShaderProgram::Compile(const std::string& vertexShaderSource, cons
 	return ShaderProgram(shaderProgram);
 }
 
+ShaderProgram::~ShaderProgram()
+{
+	if (m_programId != 0)
+	{
+		glDeleteProgram(m_programId);
+	}
+}
+
+ShaderProgram::ShaderProgram(ShaderProgram&& other) noexcept
+{
+	m_programId = other.m_programId;
+	other.m_programId = 0;
+
+	m_shaderLocationCache = std::move(other.m_shaderLocationCache);
+	m_shaderValueCache = std::move(other.m_shaderValueCache);
+	m_verboseLogging = other.m_verboseLogging;
+}
+
+ShaderProgram& ShaderProgram::operator=(ShaderProgram&& other) noexcept
+{
+	if (this == &other)
+		return *this;
+
+	if (m_programId != 0)
+		glDeleteProgram(m_programId);
+
+	m_programId = other.m_programId;
+	other.m_programId = 0;
+
+	m_shaderLocationCache = std::move(other.m_shaderLocationCache);
+	m_shaderValueCache = std::move(other.m_shaderValueCache);
+	m_verboseLogging = other.m_verboseLogging;
+
+	return *this;
+}
+
 int ShaderProgram::GetPramLocation(const std::string& paramName) const
 {
 	auto iter = m_shaderLocationCache.find(paramName);

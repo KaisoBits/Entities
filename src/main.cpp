@@ -43,7 +43,7 @@ void handleKey(GLFWwindow* window, int key, int scancode, int action, int mods);
 void handleCameraMovement(GLFWwindow* window, float deltaTime);
 
 void initImGui(GLFWwindow* window);
-void beginFrameImGui();
+void beginFrameImGui(Model& newEntityModel, Material newEntityMaterial);
 void endFrameImGui();
 void cleanupImGui();
 bool imGuiMenuOpen = false;
@@ -97,9 +97,6 @@ std::vector<SpotLight> spotLights = {
 	}
 };
 
-std::optional<Model> model;
-std::optional<Material> material1;
-
 int main()
 {
 	if (!glfwInit())
@@ -128,103 +125,105 @@ int main()
 	if (glfwRawMouseMotionSupported())
 		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
-	std::string vertexShader = readFileAsString("shaders/vertexShader.glsl");
-	std::string fragmentShader = readFileAsString("shaders/fragmentShader.glsl");
-	std::string highlightFragmentShader = readFileAsString("shaders/highlightShader.glsl");
-
-	ShaderProgram sp = ShaderProgram::Compile(vertexShader, fragmentShader);
-	ShaderProgram hs = ShaderProgram::Compile(vertexShader, highlightFragmentShader);
-	model = ObjParser::LoadFromFile("resources/models/cube.obj");
-	material1 = Material(&sp, &hs);
-	const Texture textureColor = Texture::LoadFromFile("resources/textures/container_color.png");
-	const Texture textureSpecular = Texture::LoadFromFile("resources/textures/container_specular.png");
-	material1->SetDiffuseMap(&textureColor);
-	material1->SetSpecularMap(&textureSpecular);
-
-	for (int i = 0; i < 10; i++)
 	{
-		for (int j = 0; j < 10; j++)
+		std::string vertexShader = readFileAsString("shaders/vertexShader.glsl");
+		std::string fragmentShader = readFileAsString("shaders/fragmentShader.glsl");
+		std::string highlightFragmentShader = readFileAsString("shaders/highlightShader.glsl");
+
+		ShaderProgram sp = ShaderProgram::Compile(vertexShader, fragmentShader);
+		ShaderProgram hs = ShaderProgram::Compile(vertexShader, highlightFragmentShader);
+		Model model = ObjParser::LoadFromFile("resources/models/cube.obj");
+		Material material1 = Material(&sp, &hs);
+		const Texture textureColor = Texture::LoadFromFile("resources/textures/container_color.png");
+		const Texture textureSpecular = Texture::LoadFromFile("resources/textures/container_specular.png");
+		material1.SetDiffuseMap(&textureColor);
+		material1.SetSpecularMap(&textureSpecular);
+
+		for (int i = 0; i < 10; i++)
 		{
-			float value = static_cast<float>(i + j) / 2.0f;
+			for (int j = 0; j < 10; j++)
+			{
+				float value = static_cast<float>(i + j) / 2.0f;
 
-			Entity e(&model.value(), material1.value());
-			e.SetPosition(glm::vec3(i * 20, 0, j * 20));
-			e.SetScale(glm::vec3(5));
-			e.SetUpdateFunc(
-				[value](Entity* e, float deltaTime) mutable {
-					constexpr float animationHeight = 10.0f;
+				Entity e(&model, material1);
+				e.SetPosition(glm::vec3(i * 20, 0, j * 20));
+				e.SetScale(glm::vec3(5));
+				e.SetUpdateFunc(
+					[value](Entity* e, float deltaTime) mutable {
+						constexpr float animationHeight = 10.0f;
 
-					glm::vec3 position = e->GetPosition();
-					position.y = sin(value) * animationHeight;
-					// e->SetPosition(position);
+						glm::vec3 position = e->GetPosition();
+						position.y = sin(value) * animationHeight;
+						// e->SetPosition(position);
 
-					e->SetRotation(glm::vec3(value * 6.0, value * 8.0f, value * 10.0f));
+						e->SetRotation(glm::vec3(value * 6.0, value * 8.0f, value * 10.0f));
 
-					value += 2.0f * deltaTime;
-				});
+						value += 2.0f * deltaTime;
+					});
 
-			entities.push_back(std::move(e));
-		}
-	}
-
-	const Model groundModel = ObjParser::LoadFromFile("resources/models/ground.obj");
-	Material groundMaterial(&sp, &hs);
-	groundMaterial.SetShininess(16);
-	const Texture groundTexture = Texture::LoadFromFile("resources/textures/ground_color.jpg");
-	const Texture groundSpecTexture = Texture::LoadFromFile("resources/textures/ground_spec.jpg");
-	groundMaterial.SetDiffuseMap(&groundTexture);
-	groundMaterial.SetSpecularMap(&groundSpecTexture);
-	Entity groundEntity(&groundModel, groundMaterial);
-	groundEntity.SetPosition(glm::vec3(100, -15, 100));
-	groundEntity.SetScale(glm::vec3(20, 1, 20));
-	entities.push_back(groundEntity);
-
-	mainCam.SetPosition(glm::vec3(0, 10, 0));
-	mainCam.SetRotation(glm::vec2(-136.0f, 21.0f));
-
-	glViewport(0, 0, windowWidth, windowHeight);
-	glfwSetWindowSizeCallback(window, windowSizeChangeCallback);
-	glfwSetCursorPosCallback(window, mouseCallback);
-	glfwSetKeyCallback(window, handleKey);
-	initImGui(window);
-
-	glClearColor(160 / 7.0f / 255.0f, 217 / 7.0f / 255.0f, 239 / 7.0f / 255.0f, 1.0f);
-
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_STENCIL_TEST);
-
-	glCullFace(GL_BACK);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-
-	double lastTime = glfwGetTime();
-	while (!glfwWindowShouldClose(window))
-	{
-		double now = glfwGetTime();
-		double deltaTime = fmin(now - lastTime, 0.3f);
-		lastTime = now;
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-		glfwPollEvents();
-
-		beginFrameImGui();
-
-		handleCameraMovement(window, static_cast<float>(deltaTime));
-
-		for (auto& entity : entities)
-		{
-			entity.Update(static_cast<float>(deltaTime));
-			entity.Draw(mainCam, suns, pointLights, spotLights);
-
-			// Clear menu highlight
-			if (imGuiMenuOpen && entity.GetIsHighlighted())
-				entity.SetIsHighlighted(false);
+				entities.push_back(std::move(e));
+			}
 		}
 
-		endFrameImGui();
+		const Model groundModel = ObjParser::LoadFromFile("resources/models/ground.obj");
+		Material groundMaterial(&sp, &hs);
+		groundMaterial.SetShininess(16);
+		const Texture groundTexture = Texture::LoadFromFile("resources/textures/ground_color.jpg");
+		const Texture groundSpecTexture = Texture::LoadFromFile("resources/textures/ground_spec.jpg");
+		groundMaterial.SetDiffuseMap(&groundTexture);
+		groundMaterial.SetSpecularMap(&groundSpecTexture);
+		Entity groundEntity(&groundModel, groundMaterial);
+		groundEntity.SetPosition(glm::vec3(100, -15, 100));
+		groundEntity.SetScale(glm::vec3(20, 1, 20));
+		entities.push_back(groundEntity);
 
-		glfwSwapBuffers(window);
+		mainCam.SetPosition(glm::vec3(0, 10, 0));
+		mainCam.SetRotation(glm::vec2(-136.0f, 21.0f));
+
+		glViewport(0, 0, windowWidth, windowHeight);
+		glfwSetWindowSizeCallback(window, windowSizeChangeCallback);
+		glfwSetCursorPosCallback(window, mouseCallback);
+		glfwSetKeyCallback(window, handleKey);
+		initImGui(window);
+
+		glClearColor(160 / 7.0f / 255.0f, 217 / 7.0f / 255.0f, 239 / 7.0f / 255.0f, 1.0f);
+
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
+		glEnable(GL_STENCIL_TEST);
+
+		glCullFace(GL_BACK);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
+		double lastTime = glfwGetTime();
+		while (!glfwWindowShouldClose(window))
+		{
+			double now = glfwGetTime();
+			double deltaTime = fmin(now - lastTime, 0.3f);
+			lastTime = now;
+
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+			glfwPollEvents();
+
+			beginFrameImGui(model, material1);
+
+			handleCameraMovement(window, static_cast<float>(deltaTime));
+
+			for (auto& entity : entities)
+			{
+				entity.Update(static_cast<float>(deltaTime));
+				entity.Draw(mainCam, suns, pointLights, spotLights);
+
+				// Clear menu highlight
+				if (imGuiMenuOpen && entity.GetIsHighlighted())
+					entity.SetIsHighlighted(false);
+			}
+
+			endFrameImGui();
+
+			glfwSwapBuffers(window);
+		}
 	}
 
 	cleanupImGui();
@@ -324,7 +323,7 @@ int selectedEntity = 0;
 int selectedSun = 0;
 int selectedPointLight = 0;
 int selectedSpotLight = 0;
-void beginFrameImGui()
+void beginFrameImGui(Model& newEntityModel, Material newEntityMaterial)
 {
 	if (!imGuiMenuOpen)
 		return;
@@ -366,7 +365,7 @@ void beginFrameImGui()
 		if (ImGui::Button("Add##entity"))
 		{
 			float value = 0;
-			Entity e(&model.value(), material1.value());
+			Entity e(&newEntityModel, newEntityMaterial);
 			e.SetPosition(mainCam.GetPosition());
 			e.SetUpdateFunc(
 				[value](Entity* e, float deltaTime) mutable {

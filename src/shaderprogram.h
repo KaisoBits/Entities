@@ -13,6 +13,10 @@ public:
 		const std::string& vertexShaderSource, const std::string& fragmentShaderSource);
 	static ShaderProgram Empty() { return ShaderProgram(0); }
 
+	~ShaderProgram();
+	ShaderProgram(ShaderProgram&& other) noexcept;
+	ShaderProgram& operator=(ShaderProgram&& other) noexcept;
+
 	[[nodiscard]] int GetPramLocation(const std::string& paramName) const;
 	void Use() const;
 
