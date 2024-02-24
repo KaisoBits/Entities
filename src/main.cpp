@@ -166,10 +166,10 @@ int main()
 		}
 
 		const Model groundModel = ObjParser::LoadFromFile("resources/models/ground.obj");
-		Material groundMaterial(&sp, &hs);
-		groundMaterial.SetShininess(16);
 		const Texture groundTexture = Texture::LoadFromFile("resources/textures/ground_color.jpg");
 		const Texture groundSpecTexture = Texture::LoadFromFile("resources/textures/ground_spec.jpg");
+		Material groundMaterial(&sp, &hs);
+		groundMaterial.SetShininess(16);
 		groundMaterial.SetDiffuseMap(&groundTexture);
 		groundMaterial.SetSpecularMap(&groundSpecTexture);
 		Entity groundEntity(&groundModel, groundMaterial);
