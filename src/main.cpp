@@ -133,11 +133,11 @@ int main()
 		ShaderProgram sp = ShaderProgram::Compile(vertexShader, fragmentShader);
 		ShaderProgram hs = ShaderProgram::Compile(vertexShader, highlightFragmentShader);
 		Model model = ObjParser::LoadFromFile("resources/models/cube.obj");
-		Material material1 = Material(&sp, &hs);
 		const Texture textureColor = Texture::LoadFromFile("resources/textures/container_color.png");
 		const Texture textureSpecular = Texture::LoadFromFile("resources/textures/container_specular.png");
-		material1.SetDiffuseMap(&textureColor);
-		material1.SetSpecularMap(&textureSpecular);
+		Material material = Material(&sp, &hs);
+		material.SetDiffuseMap(&textureColor);
+		material.SetSpecularMap(&textureSpecular);
 
 		for (int i = 0; i < 10; i++)
 		{
@@ -145,7 +145,7 @@ int main()
 			{
 				float value = static_cast<float>(i + j) / 2.0f;
 
-				Entity e(&model, material1);
+				Entity e(&model, material);
 				e.SetPosition(glm::vec3(i * 20, 0, j * 20));
 				e.SetScale(glm::vec3(5));
 				e.SetUpdateFunc(
@@ -175,7 +175,7 @@ int main()
 		Entity groundEntity(&groundModel, groundMaterial);
 		groundEntity.SetPosition(glm::vec3(100, -15, 100));
 		groundEntity.SetScale(glm::vec3(20, 1, 20));
-		entities.push_back(groundEntity);
+		entities.push_back(std::move(groundEntity));
 
 		mainCam.SetPosition(glm::vec3(0, 10, 0));
 		mainCam.SetRotation(glm::vec2(-136.0f, 21.0f));
@@ -206,7 +206,7 @@ int main()
 
 			glfwPollEvents();
 
-			beginFrameImGui(model, material1);
+			beginFrameImGui(model, material);
 
 			handleCameraMovement(window, static_cast<float>(deltaTime));
 
