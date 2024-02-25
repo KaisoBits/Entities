@@ -5,7 +5,7 @@
 class Texture
 {
 public:
-    static Texture LoadFromFile(const std::string& path);
+    static Texture LoadFromFile(const std::string& path, bool repeat = true);
     static Texture Empty() { return Texture(0); }
 
     Texture() = delete;
