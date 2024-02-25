@@ -150,14 +150,7 @@ int main()
 				e.SetScale(glm::vec3(5));
 				e.SetUpdateFunc(
 					[value](Entity* e, float deltaTime) mutable {
-						constexpr float animationHeight = 10.0f;
-
-						glm::vec3 position = e->GetPosition();
-						position.y = sin(value) * animationHeight;
-						// e->SetPosition(position);
-
 						e->SetRotation(glm::vec3(value * 6.0, value * 8.0f, value * 10.0f));
-
 						value += 2.0f * deltaTime;
 					});
 
@@ -369,13 +362,7 @@ void beginFrameImGui(Model& newEntityModel, Material newEntityMaterial)
 			e.SetPosition(mainCam.GetPosition());
 			e.SetUpdateFunc(
 				[value](Entity* e, float deltaTime) mutable {
-					constexpr float animationHeight = 10.0f;
-
-					glm::vec3 position = e->GetPosition();
-					position.y = sin(value) * animationHeight;
-
 					e->SetRotation(glm::vec3(value * 6.0, value * 8.0f, value * 10.0f));
-
 					value += 2.0f * deltaTime;
 				});
 
