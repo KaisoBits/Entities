@@ -83,8 +83,12 @@ float getAttenuation(float dist, float constant, float linear, float quadratic)
 void main()
 {
 	// Sample material
+	vec4 pixelColor = texture(material.diffuseMap, textureCoord);
+	if (pixelColor.w < 0.1)
+		discard;
+
 	vec3 diffuseMaterialStrength = material.diffuseOverride ? 
-		material.color : vec3(texture(material.diffuseMap, textureCoord)) * material.color;
+		material.color : vec3(pixelColor) * material.color;
 	vec3 specularMaterialStrength = material.specularOverride ? 
 		vec3(0.5) : vec3(texture(material.specularMap, textureCoord));
 

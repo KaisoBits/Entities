@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <random>
 #include <chrono>
 
 #include <glad/glad.h>
@@ -99,6 +100,9 @@ std::vector<SpotLight> spotLights = {
 
 int main()
 {
+	std::random_device rd;
+	std::mt19937 gen(rd());
+
 	if (!glfwInit())
 		return -1;
 
@@ -170,6 +174,28 @@ int main()
 		groundEntity.SetScale(glm::vec3(20, 1, 20));
 		entities.push_back(std::move(groundEntity));
 
+		const Model billboardModel = ObjParser::LoadFromFile("resources/models/grass.obj");
+		const Texture grassTexture = Texture::LoadFromFile("resources/textures/grass.png", false);
+		Material grassMaterial(&sp, &hs);
+		grassMaterial.SetDiffuseMap(&grassTexture);
+		grassMaterial.SetShininess(8);
+
+		std::uniform_real_distribution<> grassSpawnRange(-50, 250);
+		for (int i = 0; i < 20; i++)
+		{
+			Entity grassEntity(&billboardModel, grassMaterial);
+			grassEntity.SetUpdateFunc(
+				[](Entity* entity, float deltaTime) {
+					glm::vec3 dir = mainCam.GetPosition() - entity->GetPosition();
+					dir.y = 0;
+					dir = glm::normalize(dir);
+					float angle = atan2(dir.z, dir.x);
+					entity->SetRotation(glm::vec3(0, 90 - glm::degrees(angle), 0));
+				});
+			grassEntity.SetPosition(glm::vec3(grassSpawnRange(gen), -15, grassSpawnRange(gen)));
+			grassEntity.SetScale(glm::vec3(6.0f));
+			entities.push_back(std::move(grassEntity));
+		}
 		mainCam.SetPosition(glm::vec3(0, 10, 0));
 		mainCam.SetRotation(glm::vec2(-136.0f, 21.0f));
 
