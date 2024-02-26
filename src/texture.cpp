@@ -100,6 +100,9 @@ Texture& Texture::operator=(Texture&& other) noexcept
 	if (this == &other)
 		return *this;
 
+	if (m_texture != 0)
+		glDeleteTextures(1, &m_texture);
+
 	m_texture = other.m_texture;
 	other.m_texture = 0;
 

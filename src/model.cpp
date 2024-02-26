@@ -56,6 +56,9 @@ Model& Model::operator= (Model&& other) noexcept
 	if (this == &other)
 		return *this;
 
+	if (m_buffer != 0)
+		glDeleteBuffers(1, &m_buffer);
+
 	m_buffer = other.m_buffer;
 	m_verticesCount = other.m_verticesCount;
 
