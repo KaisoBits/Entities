@@ -416,10 +416,10 @@ void beginFrameImGui(Model& newEntityModel, Material newEntityMaterial)
 		}
 		ImGui::TreePop();
 		ImGui::Spacing();
-
-		if (selectedEntity >= 0)
-			entities[selectedEntity].SetIsHighlighted(true);
 	}
+
+	if (selectedEntity >= 0)
+		entities[selectedEntity].SetIsHighlighted(true);
 
 	if (ImGui::TreeNode("Sun controls"))
 	{
