@@ -135,6 +135,23 @@ void ShaderProgram::SetInt(const std::string& paramName, int value)
 	}
 }
 
+void ShaderProgram::SetUint(const std::string& paramName, unsigned int value)
+{
+	int location = GetPramLocation(paramName);
+	if (location < 0)
+	{
+		if (m_verboseLogging)
+			std::cout << "Unknown param name \"" << paramName << "\"\n";
+		return;
+	}
+
+	auto cachedIt = m_shaderValueCache.find(paramName);
+	if (cachedIt == m_shaderValueCache.end() || std::get<unsigned int>(cachedIt->second) != value) {
+		m_shaderValueCache[paramName] = value;
+		glUniform1ui(location, value);
+	}
+}
+
 void ShaderProgram::SetFloat(const std::string& paramName, float value)
 {
 	int location = GetPramLocation(paramName);
