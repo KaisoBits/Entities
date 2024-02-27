@@ -7,12 +7,14 @@
 void Entity::Draw(const Camera& camera,
 	const std::vector<Sun>& suns,
 	const std::vector<PointLight>& pointLights,
-	const std::vector<SpotLight>& spotLights) const
+	const std::vector<SpotLight>& spotLights,
+	int id) const
 {
 	if (!m_model)
 		return;
 
 	m_material.Use(suns, pointLights, spotLights);
+	m_material.GetShader().SetInt("entityId", id);
 
 	ApplyPositionAndRotation(m_material.GetShader());
 	ApplyCamera(m_material.GetShader(), camera);

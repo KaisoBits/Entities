@@ -1,10 +1,13 @@
 #version 460 core
 
-out vec4 FragColor;
+layout(location = 0) out vec4 FragColor;
+layout(location = 1) out int EntitiyId;
 
 in vec2 textureCoord;
 in vec3 fragmentPosition;
 in vec3 normalVector;
+
+uniform int entityId;
 
 uniform vec3 cameraPosition;
 
@@ -140,4 +143,5 @@ void main()
 	vec3 spotLights = diffuseSpotLight + specularSpotLight;
 
 	FragColor = vec4(sunLights + pointLights + spotLights, 1.0);
+	EntitiyId = entityId;
 }

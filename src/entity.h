@@ -20,7 +20,8 @@ public:
 	void Draw(const Camera& camera,
 		const std::vector<Sun>& sun,
 		const std::vector<PointLight>& pointLight,
-		const std::vector<SpotLight>& spotLight) const;
+		const std::vector<SpotLight>& spotLight,
+		int id) const;
 
 	[[nodiscard]] Material GetMaterial() const { return m_material; }
 	void SetMaterial(Material newMaterial) { m_material = std::move(newMaterial); }

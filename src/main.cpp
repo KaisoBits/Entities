@@ -30,8 +30,8 @@ using namespace std::chrono_literals;
 
 constexpr int maxLights = 10;
 
-constexpr int windowWidth = 800;
-constexpr int windowHeight = 600;
+constexpr int windowWidth = 900;
+constexpr int windowHeight = windowWidth * (9.0f / 16.0f);
 
 constexpr float cameraSpeed = 20.0f;
 constexpr float cameraRunSpeed = 80.0f;
@@ -39,6 +39,7 @@ constexpr float mouseSensitivity = 0.1f;
 
 void windowSizeChangeCallback(GLFWwindow* window, int newWidth, int newHeight);
 void mouseCallback(GLFWwindow* window, double xpos, double ypos);
+void handleMouseButton(GLFWwindow* window, int button, int action, int mods);
 void handleKey(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 void handleCameraMovement(GLFWwindow* window, float deltaTime);
@@ -50,8 +51,17 @@ void cleanupImGui();
 bool imGuiMenuOpen = false;
 
 Camera mainCam(75, static_cast<float>(windowWidth) / windowHeight);
-
 std::vector<Entity> entities;
+
+unsigned int framebuffer;
+unsigned int colorTexture;
+unsigned int entityTexture;
+unsigned int depthStencilBufferObject;
+
+int selectedEntity = 0;
+int selectedSun = 0;
+int selectedPointLight = 0;
+int selectedSpotLight = 0;
 
 std::vector<Sun> suns = {
 	{
@@ -214,6 +224,7 @@ int main()
 		glfwSetWindowSizeCallback(window, windowSizeChangeCallback);
 		glfwSetCursorPosCallback(window, mouseCallback);
 		glfwSetKeyCallback(window, handleKey);
+		glfwSetMouseButtonCallback(window, handleMouseButton);
 		initImGui(window);
 
 		glClearColor(160 / 7.0f / 255.0f, 217 / 7.0f / 255.0f, 239 / 7.0f / 255.0f, 1.0f);
@@ -225,34 +236,97 @@ int main()
 		glCullFace(GL_BACK);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
+		std::string screenVertexShader = readFileAsString("shaders/screenVertShader.glsl");
+		std::string screenFragmentShader = readFileAsString("shaders/screenFragShader.glsl");
+		ShaderProgram screenShader = ShaderProgram::Compile(screenVertexShader, screenFragmentShader);
+		Model screenModel = ObjParser::LoadFromFile("resources/models/screen.obj");
+
+		glGenFramebuffers(1, &framebuffer);
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		GLenum attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+		glDrawBuffers(2, attachments);
+
+		glGenTextures(1, &colorTexture);
+		glBindTexture(GL_TEXTURE_2D, colorTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, windowWidth, windowHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture, 0);
+
+		// Texture for storing entity ID per pixel
+		glGenTextures(1, &entityTexture);
+		glBindTexture(GL_TEXTURE_2D, entityTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R32I, windowWidth, windowHeight, 0, GL_RED_INTEGER, GL_INT, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, entityTexture, 0);
+
+		glGenRenderbuffers(1, &depthStencilBufferObject);
+		glBindRenderbuffer(GL_RENDERBUFFER, depthStencilBufferObject);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowWidth, windowHeight);
+
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthStencilBufferObject);
+
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		{
+			std::cout << "Failed creating the framebuffer!\n";
+			return -4;
+		}
+
 		double lastTime = glfwGetTime();
 		while (!glfwWindowShouldClose(window))
 		{
+			glEnable(GL_DEPTH_TEST);
+
+			glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 			double now = glfwGetTime();
 			double deltaTime = fmin(now - lastTime, 0.3f);
 			lastTime = now;
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-			glfwPollEvents();
-
-			beginFrameImGui(model, material);
+			int c = -1;
+			glClearBufferiv(GL_COLOR, 1, &c);
 
 			handleCameraMovement(window, static_cast<float>(deltaTime));
 
+			int id = 0;
 			for (auto& entity : entities)
 			{
 				entity.Update(static_cast<float>(deltaTime));
-				entity.Draw(mainCam, suns, pointLights, spotLights);
+				entity.Draw(mainCam, suns, pointLights, spotLights, id);
 
 				// Clear menu highlight
 				if (imGuiMenuOpen && entity.GetIsHighlighted())
 					entity.SetIsHighlighted(false);
+
+				id++;
 			}
+
+			glfwPollEvents();
+
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glDisable(GL_DEPTH_TEST);
+
+			beginFrameImGui(model, material);
+
+			glActiveTexture(GL_TEXTURE0);
+			GLint originalTexture;
+			glGetIntegerv(GL_TEXTURE_BINDING_2D, &originalTexture);
+			glBindTexture(GL_TEXTURE_2D, colorTexture);
+			screenShader.Use();
+			screenModel.Draw();
+			glBindTexture(GL_TEXTURE_2D, originalTexture);
 
 			endFrameImGui();
 
 			glfwSwapBuffers(window);
+
+			glClear(GL_COLOR_BUFFER_BIT);
 		}
 	}
 
@@ -260,6 +334,28 @@ int main()
 	glfwTerminate();
 
 	return 0;
+}
+
+void handleMouseButton(GLFWwindow* window, int button, int action, int mods)
+{
+	if (ImGui::IsAnyItemHovered() || ImGui::IsAnyItemActive())
+		return;
+
+	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE)
+	{
+		double x, y;
+		int w, h;
+		int value;
+		glfwGetCursorPos(window, &x, &y);
+		glfwGetWindowSize(window, &w, &h);
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		glReadBuffer(GL_COLOR_ATTACHMENT1);
+		glReadPixels(x, h - y, 1, 1, GL_RED_INTEGER, GL_INT, &value);
+		if (value < 0)
+			return;
+
+		selectedEntity = fmin(value, entities.size() - 1);
+	}
 }
 
 void handleKey(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -313,8 +409,18 @@ void windowSizeChangeCallback(GLFWwindow* window, int newWidth, int newHeight)
 	if (newWidth == 0 || newHeight == 0) // ignore minimizing
 		return;
 
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, newWidth, newHeight);
 	mainCam.SetAspectRatio(static_cast<float>(newWidth) / static_cast<float>(newHeight));
+
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+	glBindTexture(GL_TEXTURE_2D, entityTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, newWidth, newHeight, 0, GL_RED_INTEGER, GL_INT, nullptr);
+	glBindTexture(GL_TEXTURE_2D, colorTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, newWidth, newHeight, 0, GL_RGB, GL_INT, nullptr);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthStencilBufferObject);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, newWidth, newHeight);
 }
 
 double lastX = -1;
@@ -349,10 +455,6 @@ void initImGui(GLFWwindow* window)
 	ImGui_ImplOpenGL3_Init();
 }
 
-int selectedEntity = 0;
-int selectedSun = 0;
-int selectedPointLight = 0;
-int selectedSpotLight = 0;
 void beginFrameImGui(Model& newEntityModel, Material newEntityMaterial)
 {
 	if (!imGuiMenuOpen)
