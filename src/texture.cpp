@@ -12,7 +12,7 @@ Texture Texture::LoadFromFile(const std::string& path, bool repeat)
 	stbi_set_flip_vertically_on_load(true);
 
 	int width, height, channelsCount;
-	unsigned char* imageData = stbi_load(path.c_str(), &width, &height, &channelsCount, 0);
+	unsigned char* imageData = stbi_load(path.c_str(), &width, &height, &channelsCount, STBI_default);
 
 	if (!imageData)
 	{
