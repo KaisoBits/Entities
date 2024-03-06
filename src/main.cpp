@@ -416,7 +416,7 @@ void windowSizeChangeCallback(GLFWwindow* window, int newWidth, int newHeight)
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
 	glBindTexture(GL_TEXTURE_2D, entityTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, newWidth, newHeight, 0, GL_RED_INTEGER, GL_INT, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32I, newWidth, newHeight, 0, GL_RED_INTEGER, GL_INT, nullptr);
 	glBindTexture(GL_TEXTURE_2D, colorTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, newWidth, newHeight, 0, GL_RGB, GL_INT, nullptr);
 	glBindRenderbuffer(GL_RENDERBUFFER, depthStencilBufferObject);
