@@ -190,7 +190,7 @@ int main()
 		grassMaterial.SetDiffuseMap(&grassTexture);
 		grassMaterial.SetShininess(8);
 
-		std::uniform_real_distribution<> grassSpawnRange(-50, 250);
+		std::uniform_real_distribution<float> grassSpawnRange(-50, 250);
 		for (int i = 0; i < 20; i++)
 		{
 			Entity grassEntity1(&billboardModel, grassMaterial);
